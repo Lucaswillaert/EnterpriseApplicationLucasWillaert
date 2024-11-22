@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+                xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="/vendor/bootstrap/css/bootstrap.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet"/>
+
+  <title layout:title-pattern="$CONTENT_TITLE - $LAYOUT_TITLE">Lending Service RITCS</title>
+</head>
+<body>
+<!-- Navigation-->
+<!-- Navigation-->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <a class="navbar-brand" href="#">
+    <img src="/assets/ritcs.png" width="100" height="70"  class="d-inline-block align-top" alt="">
+  </a>
+
+  <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
+    <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+      <li class="nav-item active">
+        <a class="nav-link" href="#">Uitleendienst </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Link</a>
+      </li>
+    </ul>
+  </div>
+  <ul class="navbar-nav ml-auto mt-3 mt-lg-0">
+    <li class="nav-item">
+      <a class="nav-link disabled" href="#">winkelmand</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#">profile </a>
+    </li>
+
+  </ul>
+</nav>
+
+<!-- body content voegen we dan toe aan de section met de tag: layout:fragment="body"-->
+<body layout:fragment="body"> </body>
+<section class="py-5 bg-light">
+  <div class="container px-5 my-5">
+    <h2 class="display-4 fw-bolder mb-4">Leen hier je Materiaal!</h2>
+    <a class="btn btn-lg btn-primary" href="#!">Contact us</a>
+  </div>
+</section>
+
+
+
+<!-- Footer-->
+<footer class="bg-dark py-4 mt-auto">
+  <div class="container px-5">
+    <div class="row align-items-center justify-content-between flex-column flex-sm-row">
+      <div class="col-auto"><div class="small m-0 text-white">Copyright &copy; Your Website 2023</div></div>
+      <div class="col-auto">
+        <a class="link-light small" href="#!">Privacy</a>
+        <span class="text-white mx-1">&middot;</span>
+        <a class="link-light small" href="#!">Terms</a>
+        <span class="text-white mx-1">&middot;</span>
+        <a class="link-light small" href="#!">Contact</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="/vendor/jquery/jquery.slim.min.js"></script>
+<script src="/vendor/popper/popper.min.js"></script>
+<script src="/vendor/bootstrap/js/bootstrap.min.js"></script>
+</body>
+</html>
