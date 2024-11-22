@@ -43,12 +43,27 @@
 </nav>
 
 <!-- body content voegen we dan toe aan de section met de tag: layout:fragment="body"-->
-<body layout:fragment="body"> </body>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-lg-9">
+      <div layout:fragment="body"></div>
+    </div>
+    <div class="col-lg-3">
+      <div class="card mb-4">
+        <div class="card-header">Winkelmand</div>
+        <div class="card-body">
+          <ul class="list-group">
+            <li class="list-group-item">Product 1</li>
+            <li class="list-group-item">Product 2</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <section class="py-5 bg-light">
-
-
-
-
   <div class="container px-5 my-5">
     <h2 class="display-4 fw-bolder mb-4">Leen hier je Materiaal!</h2>
 
