@@ -34,4 +34,6 @@ build/
 
 node_modules/
 
+# Ignore vendor directory
+/src/main/resources/static/vendor/
 

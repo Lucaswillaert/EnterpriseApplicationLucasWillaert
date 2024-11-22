@@ -3,14 +3,16 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "copy:vendor": "mkdir -p src/main/resources/static/vendor/bootstrap && cp -r node_modules/bootstrap/dist/* src/main/resources/static/vendor/bootstrap && mkdir -p src/main/resources/static/vendor/jquery && cp -r node_modules/jquery/dist/* src/main/resources/static/vendor/jquery && mkdir -p src/main/resources/static/vendor/popper && cp -r node_modules/@popperjs/core/dist/umd/* src/main/resources/static/vendor/popper"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "bootstrap": "^5.3.3"
+    "bootstrap": "^5.3.3",
+    "jquery": "^3.6.0"
   }
 }
 
