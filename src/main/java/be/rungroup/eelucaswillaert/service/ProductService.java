@@ -17,4 +17,6 @@ public interface ProductService {
     void deleteProduct(long id);
 
     List<ProductDto> searchProducts(String query);
+
+    boolean isProductAvailable(long id);
 }

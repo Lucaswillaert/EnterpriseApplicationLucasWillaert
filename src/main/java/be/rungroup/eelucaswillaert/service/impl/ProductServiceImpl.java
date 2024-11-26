@@ -52,6 +52,17 @@ public class ProductServiceImpl implements ProductService {
         return List.of();
     }
 
+    @Override
+    public boolean isProductAvailable(long id) {
+        Product product = productrepository.findById(id).get();
+
+        if(product.getTotalStock() > 0){
+            return true;
+        }
+        else
+            return false;
+    }
+
     //mapt een model naar een Data Transfer Object
     public static Product mapToProductDto(Product product) {
         return Product.builder()
