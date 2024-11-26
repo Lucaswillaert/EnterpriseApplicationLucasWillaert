@@ -12,15 +12,18 @@ public class ProductServiceImpl implements ProductService {
 
     private ProductRepository productrepository;
 
-
+    //TODO: add all the necessary methods for the ProductService
+    //TODO: add ALL the tables in the database
+    //TODO: add all the controllers for the tables
+    //TODO: add all the models for the tables and the relationships
+    //TODO: add all the repositories/Services for the tables
 
     //returnt een lijst van alle producten
     @Override
     public List<Product> findAllProducts() {
         List<Product> products = productrepository.findAll();
-        return products.stream().map(product -> mapToProductDto(product)).collect(Collectors.toList());
+        return products.stream().map(product -> mapToProductDto(product)).collect(Collectors.toList()).reversed();
     }
-
 
     //slaat een product op
     @Override
@@ -74,6 +77,7 @@ public class ProductServiceImpl implements ProductService {
                 .totalStock(product.getTotalStock())
                 .build();
     }
+
     //mapt een Data Transfer Object naar een model
     public static Product mapToProduct(ProductDto product) {
         return Product.builder()

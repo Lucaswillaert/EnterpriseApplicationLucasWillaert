@@ -16,8 +16,7 @@
       <div th:each="product : ${products}" class="col-lg-6 mb-2">
         <div class="position-relative mb-3">
           <img class="img-fluid rounded-3 mb-3" th:src="${product.photoUrl}"  alt="..." />
-          <a th:text="${product.name}" class="h3 fw-bolder text-decoration-none link-dark stretched-link" href="#!">name</a>
-
+          <a th:text="${product.name}" class="h3 fw-bolder text-decoration-none link-dark stretched-link" href="#!">Name</a>
         </div>
         <a class="btn btn-primary" >View</a>
         <a class="btn btn-primary" >Edit</a>
