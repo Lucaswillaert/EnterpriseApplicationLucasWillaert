@@ -1,4 +1,4 @@
-package be.rungroup.eelucaswillaert.controller;
+package be.rungroup.eelucaswillaert.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
