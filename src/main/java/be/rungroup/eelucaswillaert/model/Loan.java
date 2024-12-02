@@ -7,12 +7,14 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Service
+
 @Setter
 @Getter
 @Entity
@@ -25,14 +27,22 @@ public class Loan {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+    @ManyToMany
+    @JoinTable(
+            name = "loan_products",
+            joinColumns = @JoinColumn(name = "loan_id"),
+            inverseJoinColumns = @JoinColumn(name = "product_id")
+    )
+    private List<Product> products = new ArrayList<>();
+
 
     private int quantity;
     private LocalDateTime startDate;
 
     private LocalDateTime endDate;
+
+
+
 
 
 
