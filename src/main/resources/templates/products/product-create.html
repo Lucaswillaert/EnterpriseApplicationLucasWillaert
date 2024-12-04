@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Product</title>
+  <link rel="stylesheet" href="/vendor/bootstrap/css/bootstrap.min.css">
+</head>
+<body class="d-flex flex-column h-100">
+<main class="flex-shrink-0">
+  <section layout:fragment="body" class="py-5">
+    <div class="container-fluid">
+      <h2>create product</h2>
+      <form th:action="@{/products/new}" th:object="${product}" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+          <label for="photoUrl">Product Photo</label>
+          <input
+                  type="file"
+                  class="form-control"
+                  id="photoUrl"
+                  th:field="*{photoUrl}"
+                  placeholder="Enter the image URL here"
+                  name="photoUrl"
+                  required>
+        </div>
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input
+                  type="text"
+                 class="form-control"
+                 id="name"
+                 th:field="*{name}"
+                  required>
+        </div>
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea
+                  class="form-control"
+                  id="description"
+                  th:field="*{description}"
+                  required></textarea>
+        </div>
+        <div class="form-group">
+          <label for="tags">Tags</label>
+          <input
+                  type="text"
+                  class="form-control"
+                  id="tags"
+                  th:field="*{tags}" required>
+        </div>
+        <div class="form-group">
+          <label for="totalStock">Total Stock</label>
+          <input
+                  type="number"
+                  class="form-control"
+                  id="totalStock"
+                  th:field="*{totalStock}"
+                  required>
+        </div>
+        <button type="submit" class="btn btn-primary">Save</button>
+      </form>
+    </div>
+  </section>
+</main>
+<script src="/vendor/jquery/jquery.slim.min.js"></script>
+<script src="/vendor/popper/popper.min.js"></script>
+<script src="/vendor/bootstrap/js/bootstrap.min.js"></script>
+</body>
+</html>

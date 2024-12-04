@@ -26,24 +26,24 @@ public class ProductServiceImpl implements ProductService {
         this.productrepository = productrepository;
     }
 
-
     //returnt een lijst van alle producten
     @Override
-    public List<Product> findAllProducts() {
+    public List<ProductDto> findAllProducts() {
         List<Product> products = productrepository.findAll();
         return products.stream().map(ProductServiceImpl::mapToProductDto).collect(Collectors.toList());
     }
 
     //slaat een product op
     @Override
-    public Product saveProduct(ProductDto productDto) {
+    public void saveProduct(ProductDto productDto) {
         Product product = mapToProduct(productDto);
-        return productrepository.save(product);
+        productrepository.save(product);
     }
 
     @Override
     public ProductDto findById(Long id) {
-        return null;
+        Product product = productrepository.findById(id).orElseThrow(()->new RuntimeException("Product not found"));
+        return mapToProductDto(product); //mapt een model naar een Data Transfer Object
     }
 
     @Override
@@ -76,8 +76,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     //mapt een model naar een Data Transfer Object
-    public static Product mapToProductDto(Product product) {
-        return Product.builder()
+    public static ProductDto mapToProductDto(Product product) {
+        return ProductDto.builder()
                 .id(product.getId())
                 .name(product.getName())
                 .description(product.getDescription())

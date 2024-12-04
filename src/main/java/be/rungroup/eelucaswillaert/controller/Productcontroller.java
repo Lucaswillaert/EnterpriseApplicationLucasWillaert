@@ -4,7 +4,6 @@ import be.rungroup.eelucaswillaert.dto.ProductDto;
 import be.rungroup.eelucaswillaert.model.Product;
 import be.rungroup.eelucaswillaert.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authorization.method.AuthorizeReturnObject;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
@@ -28,33 +27,37 @@ public class Productcontroller {
 
     @GetMapping("/products")
     public String showAllProducts(Model model) {
-        List<Product> products= productService.findAllProducts();
+        List<ProductDto> products= productService.findAllProducts();
         model.addAttribute("products",products);
 
-        return "product-list";
+        return "/products/product-list";
     }
     //TODO: add ALL API endpoints for the ProductController
 
     @GetMapping("/products/{id}")
-    public String productDetail(@PathVariable long id, Model model){
+    public String productDetail(@PathVariable long id, Model model) {
         ProductDto productDto = productService.findById(id);
-        model.addAttribute("Product", productDto);
-        return "product-detail";
+        if (productDto == null) {
+            throw new RuntimeException("Product not found with id: " + id);
+        }
+        model.addAttribute("product", productDto);
+        return "products/product-detail";
     }
+
 
 
     @GetMapping("/products/new")
     public String createProductForm(Model model){
         Product product = new Product();
         model.addAttribute("product",product);
-        return "product-create";
+        return "products/product-create";
     }
 
     @PostMapping("/products/new")
     public String saveProduct(@ModelAttribute ProductDto productDto , BindingResult result, Model model ){
         if(result.hasErrors()){
             model.addAttribute("product",productDto);
-            return "product-create";
+            return "/products/product-create";
         }
         else {
             productService.saveProduct(productDto);
