@@ -15,11 +15,6 @@ public class ProductServiceImpl implements ProductService {
 
     private ProductRepository productrepository;
 
-    //TODO: add all the necessary methods for the ProductService
-    //TODO: add ALL the tables in the database
-    //TODO: add all the controllers for the tables
-    //TODO: add all the models for the tables and the relationships
-    //TODO: add all the repositories/Services for the tables
 
     @Autowired
     public ProductServiceImpl(ProductRepository productrepository) {

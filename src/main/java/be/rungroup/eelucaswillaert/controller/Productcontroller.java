@@ -2,6 +2,7 @@ package be.rungroup.eelucaswillaert.controller;
 
 import be.rungroup.eelucaswillaert.dto.ProductDto;
 import be.rungroup.eelucaswillaert.model.Product;
+import be.rungroup.eelucaswillaert.model.Tag;
 import be.rungroup.eelucaswillaert.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -17,7 +18,7 @@ import java.util.List;
 public class Productcontroller {
 
 
-    //TODO: aan te maken templates: product-detail.html, product-create.html, product-update.html
+    //TODO: aan te maken templates: product-detail.html, product-create.html, product-edit.html
     @Autowired
     private ProductService productService;
 
@@ -44,12 +45,11 @@ public class Productcontroller {
         return "products/product-detail";
     }
 
-
-
     @GetMapping("/products/new")
     public String createProductForm(Model model){
         Product product = new Product();
-        model.addAttribute("product",product);
+        model.addAttribute("product", product);
+        model.addAttribute("tags", Tag.values());
         return "products/product-create";
     }
 
@@ -70,15 +70,16 @@ public class Productcontroller {
     public String editProductForm(@PathVariable long id, Model model ){
         ProductDto productDto = productService.findById(id);
         model.addAttribute("product",productDto);
-        return "product-edit";
+        model.addAttribute("tags", Tag.values());
+        return "products/product-edit";
     }
 
 
-    @PostMapping("/products/{id}/update")
-    public String updateForm(@ModelAttribute ProductDto productDto, BindingResult result, Model model){
+    @PostMapping("/products/{id}/edit")
+    public String editProduct(@ModelAttribute ProductDto productDto, BindingResult result, Model model){
         if(result.hasErrors()){
             model.addAttribute("product",productDto);
-            return "product-update";
+            return "products/product-edit";
         }
         else {
             productService.updateProduct(productDto);
