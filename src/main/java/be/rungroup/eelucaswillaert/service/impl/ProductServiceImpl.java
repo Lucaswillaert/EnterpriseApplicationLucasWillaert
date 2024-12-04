@@ -4,10 +4,13 @@ import be.rungroup.eelucaswillaert.dto.ProductDto;
 import be.rungroup.eelucaswillaert.model.Product;
 import be.rungroup.eelucaswillaert.repository.ProductRepository;
 import be.rungroup.eelucaswillaert.service.ProductService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
 public class ProductServiceImpl implements ProductService {
 
     private ProductRepository productrepository;
@@ -18,11 +21,17 @@ public class ProductServiceImpl implements ProductService {
     //TODO: add all the models for the tables and the relationships
     //TODO: add all the repositories/Services for the tables
 
+    @Autowired
+    public ProductServiceImpl(ProductRepository productrepository) {
+        this.productrepository = productrepository;
+    }
+
+
     //returnt een lijst van alle producten
     @Override
     public List<Product> findAllProducts() {
         List<Product> products = productrepository.findAll();
-        return products.stream().map(product -> mapToProductDto(product)).collect(Collectors.toList()).reversed();
+        return products.stream().map(ProductServiceImpl::mapToProductDto).collect(Collectors.toList());
     }
 
     //slaat een product op

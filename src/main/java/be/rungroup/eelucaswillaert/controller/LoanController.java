@@ -24,6 +24,8 @@ public class LoanController {
     @Autowired
     private ProductRepository productRepository;
 
+
+    //TODO: Implementeer deze methode:borrowProduct
     @PostMapping("/borrow")
     public ResponseEntity<String> borrowProduct(@RequestBody LoanDTO loanDTO) {
         try {
@@ -36,7 +38,7 @@ public class LoanController {
                     .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
             // Voeg het product toe aan de Loan via de service
-            loanService.addProductToLoan(user, product);
+            //loanService.addProductToLoan(user, product);
 
             return ResponseEntity.ok("Product successfully borrowed!");
         } catch (IllegalArgumentException e) {

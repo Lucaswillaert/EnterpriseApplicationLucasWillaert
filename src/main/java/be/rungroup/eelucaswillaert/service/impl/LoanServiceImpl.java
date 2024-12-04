@@ -9,10 +9,12 @@ import be.rungroup.eelucaswillaert.repository.LoanRepository;
 import be.rungroup.eelucaswillaert.repository.ProductRepository;
 import be.rungroup.eelucaswillaert.repository.UserRepository;
 import be.rungroup.eelucaswillaert.service.LoanService;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
+@Service
 public class LoanServiceImpl implements LoanService {
 
     private final LoanRepository loanrepository;
@@ -27,39 +29,7 @@ public class LoanServiceImpl implements LoanService {
 
 
     public void addProductToLoan(User user, ProductDto productDTO) {
-        // Map de ProductDTO naar een Product entity
-        Product product = productrepository.findById(productDTO.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Product niet gevonden met ID: " + productDTO.getId()));
 
-        // Controleer of er voldoende voorraad is
-        if (product.getTotalStock() <= 0) {
-            throw new IllegalStateException("Het product is niet meer beschikbaar.");
-        }
-
-        // Zoek een actieve loan voor de gebruiker
-        Loan loan = loanrepository.findByUserAndReturnedFalse(user).orElseGet(() -> {
-            Loan newLoan = new Loan();
-            newLoan.setUser(user);
-            newLoan.setStartDate(LocalDateTime.now());
-            newLoan.setEndDate(LocalDateTime.now().plusDays(7)); // Stel een standaard uitleentermijn in
-            return loanrepository.save(newLoan);
-        });
-
-        // Controleer of het product al in de loan zit
-        if (loan.getProducts().contains(product)) {
-            throw new IllegalStateException("Het product is al toegevoegd aan de loan.");
-        }
-
-        // Voeg het product toe aan de loan
-        loan.getProducts().add(product);
-
-        // Verminder de hoeveelheid van het product
-        product.setTotalStock(product.getTotalStock() - productDTO.getTotalStock());
-        productrepository.save(product);
-
-
-        // Sla de loan op
-        loanrepository.save(loan);
     }
 
     public LoanDTO getLoanById(Long id) {

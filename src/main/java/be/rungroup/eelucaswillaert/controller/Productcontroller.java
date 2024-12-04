@@ -8,7 +8,8 @@ import org.springframework.security.authorization.method.AuthorizeReturnObject;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -16,6 +17,8 @@ import java.util.List;
 @Service
 public class Productcontroller {
 
+
+    //TODO: aan te maken templates: product-detail.html, product-create.html, product-update.html
     @Autowired
     private ProductService productService;
 
@@ -31,6 +34,75 @@ public class Productcontroller {
         return "product-list";
     }
     //TODO: add ALL API endpoints for the ProductController
+
+    @GetMapping("/products/{id}")
+    public String productDetail(@PathVariable long id, Model model){
+        ProductDto productDto = productService.findById(id);
+        model.addAttribute("Product", productDto);
+        return "product-detail";
+    }
+
+
+    @GetMapping("/products/new")
+    public String createProductForm(Model model){
+        Product product = new Product();
+        model.addAttribute("product",product);
+        return "product-create";
+    }
+
+    @PostMapping("/products/new")
+    public String saveProduct(@ModelAttribute ProductDto productDto , BindingResult result, Model model ){
+        if(result.hasErrors()){
+            model.addAttribute("product",productDto);
+            return "product-create";
+        }
+        else {
+            productService.saveProduct(productDto);
+            return "redirect:/products";
+        }
+
+    }
+
+    @GetMapping("/products/{id}/edit")
+    public String editProductForm(@PathVariable long id, Model model ){
+        ProductDto productDto = productService.findById(id);
+        model.addAttribute("product",productDto);
+        return "product-edit";
+    }
+
+
+    @PostMapping("/products/{id}/update")
+    public String updateForm(@ModelAttribute ProductDto productDto, BindingResult result, Model model){
+        if(result.hasErrors()){
+            model.addAttribute("product",productDto);
+            return "product-update";
+        }
+        else {
+            productService.updateProduct(productDto);
+            return "redirect:/products";
+        }
+    }
+
+    @DeleteMapping("/products/{id}/delete")
+    public String deleteProduct(@PathVariable long id){
+        productService.deleteProduct(id);
+        return "redirect:/products";
+    }
+
+    @GetMapping("/products/search")
+    public String SearchCatalogue(@RequestParam(value="query")String query, Model model){
+        List<ProductDto> products = productService.searchProducts(query);
+        model.addAttribute("products",products);
+        return "product-list";
+    }
+
+
+
+
+
+
+
+
 
 
 
