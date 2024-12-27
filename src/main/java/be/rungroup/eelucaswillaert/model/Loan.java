@@ -33,11 +33,13 @@ public class Loan {
 
 
     private int quantity;
-    private LocalDateTime startDate;
-
-    private LocalDateTime endDate;
 
 
+    public Loan (User user, List<Product> products, int quantity){
+        this.user = user;
+        this.products = products;
+        this.quantity = quantity;
+    }
 
 
 

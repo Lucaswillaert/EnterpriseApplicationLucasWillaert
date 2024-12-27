@@ -11,8 +11,7 @@ import java.util.Optional;
 @Repository
 public interface LoanRepository extends JpaRepository<Loan, Long> {
 
-    // Vind alle loans van een specifieke gebruiker die nog niet afgerond zijn
-    Optional<Loan> findLoanByUser(User user);
+    Optional<Loan> findByUserId(Long userId);
 
 
 }

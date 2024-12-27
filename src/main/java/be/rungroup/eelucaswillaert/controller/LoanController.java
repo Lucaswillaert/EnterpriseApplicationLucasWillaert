@@ -46,10 +46,4 @@ public class LoanController {
         }
     }
 
-
-    @PostMapping("/return/{loanId}")
-    public ResponseEntity<String> returnProduct(@PathVariable Long loanId) {
-        loanService.returnProduct(loanId);
-        return ResponseEntity.ok("Product successfully returned!");
-    }
 }
