@@ -1,19 +1,20 @@
 package be.rungroup.eelucaswillaert.service;
 
-import be.rungroup.eelucaswillaert.dto.ProductDto;
-import be.rungroup.eelucaswillaert.model.Loan;
+import be.rungroup.eelucaswillaert.dto.LoanDTO;
+import be.rungroup.eelucaswillaert.model.Product;
 import be.rungroup.eelucaswillaert.model.User;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.time.LocalDateTime;
 
 @Service
 public interface LoanService {
 
-     void addProductToLoan(User user , ProductDto productDto);
+     void addProductToBasket(User user , Product product, LocalDateTime startDate, LocalDateTime endDate);
 
      void returnProduct(Long loanId, Long ProductId);
 
      int findQuantityPerProduct(Long loanId, Long productId);
 
+     LoanDTO getLoanById(Long id);
 }

@@ -16,5 +16,7 @@ public class LoanDTO {
     private Long userId;
     private List<Long> productIds; // Lijst van product-IDs
     private int quantity;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
 }
 

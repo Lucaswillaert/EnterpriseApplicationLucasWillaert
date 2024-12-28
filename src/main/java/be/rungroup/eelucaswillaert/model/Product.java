@@ -2,11 +2,8 @@ package be.rungroup.eelucaswillaert.model;
 
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -37,6 +34,16 @@ public class Product {
     @ElementCollection
     @Enumerated(EnumType.STRING)
     private List<Tag> tags = new ArrayList<>();
+
+    // Make the constructor public
+    public void ProductDto(Long id, String name, String description, int totalStock, String photoUrl, List<Tag> tags) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.totalStock = totalStock;
+        this.photoUrl = photoUrl;
+        this.tags = tags;
+    }
 
 
 }

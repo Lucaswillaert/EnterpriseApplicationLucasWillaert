@@ -3,7 +3,9 @@ package be.rungroup.eelucaswillaert.controller;
 import be.rungroup.eelucaswillaert.dto.ProductDto;
 import be.rungroup.eelucaswillaert.model.Product;
 import be.rungroup.eelucaswillaert.model.Tag;
+
 import be.rungroup.eelucaswillaert.service.ProductService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;

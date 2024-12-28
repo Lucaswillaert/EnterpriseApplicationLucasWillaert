@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 @Service
 public class ProductServiceImpl implements ProductService {
 
-    private ProductRepository productrepository;
+    private final ProductRepository productrepository;
 
 
     @Autowired
@@ -63,11 +63,7 @@ public class ProductServiceImpl implements ProductService {
     public boolean isProductAvailable(long id) {
         Product product = productrepository.findById(id).get();
 
-        if(product.getTotalStock() > 0){
-            return true;
-        }
-        else
-            return false;
+        return product.getTotalStock() > 0;
     }
 
     //mapt een model naar een Data Transfer Object

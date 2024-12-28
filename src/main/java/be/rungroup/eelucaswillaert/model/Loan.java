@@ -30,15 +30,20 @@ public class Loan {
             inverseJoinColumns = @JoinColumn(name = "product_id")
     )
     private List<Product> products = new ArrayList<>();
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
 
 
     private int quantity;
 
 
-    public Loan (User user, List<Product> products, int quantity){
+    public Loan (User user, List<Product> products, int quantity, LocalDateTime startDate, LocalDateTime endDate) {
         this.user = user;
         this.products = products;
         this.quantity = quantity;
+        this.startDate = startDate;
+        this.endDate = endDate;
+
     }
 
 

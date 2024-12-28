@@ -28,9 +28,26 @@
                         </div>
                         <h2 class="mt-5">
                         </h2>
-                        <button class="btn btn-dark btn-rounded mr-1" data-toggle="tooltip" title="" data-original-title="Add to cart">
-                            <i class="fa fa-shopping-cart"></i>
-                        </button>
+                        <form method="post" th:action="@{/basket/add}" class="d-inline">
+                           <!-- <input type="hidden" th:value="${user.id}" name="userId"/> -->
+                            <input type="hidden" th:value="${product.id}" name="productId"/>
+                            <!-- Start Date -->
+                            <label for="startDate">Start Date:</label>
+                            <input type="date" id="startDate" name="startDate" required/>
+                            <br/>
+                            <!-- End Date -->
+                            <label for="endDate">End Date:</label>
+                            <input type="date" id="endDate" name="endDate" required/>
+                            <br/>
+                            <!-- Error Message -->
+                           <!-- <div th:if="${error}" style="color: red;">
+                                <p th:text="${error}"></p>
+                            </div> -->
+                            <button class="btn btn-dark btn-rounded mr-1" type="submit">
+                                <i class="fa fa-shopping-cart"></i> Add to Basket
+                            </button>
+                        </form>
+
 
                     </div>
                 </div>

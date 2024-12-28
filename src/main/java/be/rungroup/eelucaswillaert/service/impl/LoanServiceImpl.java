@@ -1,7 +1,6 @@
 package be.rungroup.eelucaswillaert.service.impl;
 
 import be.rungroup.eelucaswillaert.dto.LoanDTO;
-import be.rungroup.eelucaswillaert.dto.ProductDto;
 import be.rungroup.eelucaswillaert.model.Loan;
 import be.rungroup.eelucaswillaert.model.Product;
 import be.rungroup.eelucaswillaert.model.User;
@@ -9,10 +8,12 @@ import be.rungroup.eelucaswillaert.repository.LoanRepository;
 import be.rungroup.eelucaswillaert.repository.ProductRepository;
 import be.rungroup.eelucaswillaert.repository.UserRepository;
 import be.rungroup.eelucaswillaert.service.LoanService;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -30,20 +31,30 @@ public class LoanServiceImpl implements LoanService {
     }
 
 
-    public void addProductToLoan(User user, ProductDto productDTO) {
-
-        // Zoek naar een loan van de gebruiker
+    public void addProductToBasket(User user, Product product, LocalDateTime startDate, LocalDateTime endDate) {
         Loan loan = loanrepository.findByUserId(user.getId())
-                .orElse(new Loan(user,new ArrayList<>(),0));
-
-        Product product = productrepository.findById(productDTO.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+                .orElseGet(() -> loanrepository.save(
+                        new Loan(user, new ArrayList<>(), 0, startDate, endDate)
+                ));
 
         loan.getProducts().add(product);
         loan.setQuantity(loan.getQuantity() + 1);
-
+        loan.setStartDate(startDate);
+        loan.setEndDate(endDate);
         loanrepository.save(loan);
     }
+
+
+
+    @Scheduled(cron = "0 0 0 * * ?") // Dagelijks om middernacht
+    public void checkExpiredLoans() {
+        List<Loan> expiredLoans = loanrepository.findAll().stream()
+                .filter(loan -> loan.getEndDate().isBefore(LocalDateTime.now()))
+                .toList();
+        // Markeer of verwerk verlopen leningen
+    }
+
+
 
     public LoanDTO getLoanById(Long id) {
         Loan loan = loanrepository.findById(id)
@@ -54,24 +65,18 @@ public class LoanServiceImpl implements LoanService {
     @Override
     public void returnProduct(Long loanId, Long productId) {
         Loan loan = loanrepository.findById(loanId)
-                .orElseThrow(() -> new IllegalArgumentException("Loan not found!"));
+                .orElseThrow(() -> new IllegalArgumentException("Not found!"));
 
-        //Vind het product in de loan
-       Optional <Product> productOptional = loan.getProducts().stream()
-                .filter(product -> product.getId().equals(productId))
-                .findFirst();
 
-       if(productOptional.isPresent()){
-           Product product = productOptional.get();
-           product.setTotalStock(product.getTotalStock() + 1);
-           productrepository.save(product);
+        Product product = loan.getProducts().stream()
+                .filter(p -> p.getId().equals(productId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Product not found in basket"));
 
-           //verwijder de product van de loan als de quantity 0 is
-           loan.getProducts().remove(product);
-           loanrepository.save(loan);
-       } else {
-           throw new IllegalArgumentException("Product not found in loan");
-       }
+        product.setTotalStock(product.getTotalStock() + 1);
+        loan.getProducts().remove(product);
+        loanrepository.save(loan);
+        productrepository.save(product);
     }
 
     @Override
@@ -111,7 +116,9 @@ public class LoanServiceImpl implements LoanService {
                 loan.getProducts().stream() // Gebruik de collectie van producten
                         .map(Product::getId)    // Haal de IDs van de producten op
                         .collect(Collectors.toList()), // Verzamel in een lijst
-                loan.getQuantity()
+                loan.getQuantity(),
+                loan.getStartDate(),
+                loan.getEndDate()
         );
     }
 
@@ -125,6 +132,8 @@ public class LoanServiceImpl implements LoanService {
                         .orElseThrow(() -> new IllegalArgumentException("Product not found")))
                 .collect(Collectors.toList()));
         loan.setQuantity(loanDTO.getQuantity());
+        loan.setStartDate(loanDTO.getStartDate());
+        loan.setEndDate(loanDTO.getEndDate());
         return loan;
     }
 
