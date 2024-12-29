@@ -19,8 +19,6 @@ import java.util.List;
 @Service
 public class Productcontroller {
 
-
-    //TODO: aan te maken templates: product-detail.html, product-create.html, product-edit.html
     @Autowired
     private ProductService productService;
 

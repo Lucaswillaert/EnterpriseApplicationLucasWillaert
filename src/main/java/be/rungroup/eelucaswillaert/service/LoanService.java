@@ -16,5 +16,5 @@ public interface LoanService {
 
      int findQuantityPerProduct(Long loanId, Long productId);
 
-     LoanDTO getLoanById(Long id);
+     LoanDTO getLoanByUserId(Long id);
 }

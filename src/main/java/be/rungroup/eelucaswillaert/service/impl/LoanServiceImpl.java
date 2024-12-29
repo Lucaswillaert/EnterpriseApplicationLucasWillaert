@@ -24,14 +24,21 @@ public class LoanServiceImpl implements LoanService {
     private final ProductRepository productrepository;
     private final UserRepository userrepository;
 
-    public LoanServiceImpl(LoanRepository loanrepository, ProductRepository productrepository, UserRepository userrepository) {
+    public LoanServiceImpl(LoanRepository loanrepository,
+                           ProductRepository productrepository,
+                           UserRepository userrepository
+    ) {
         this.loanrepository = loanrepository;
         this.productrepository = productrepository;
         this.userrepository = userrepository;
     }
 
 
-    public void addProductToBasket(User user, Product product, LocalDateTime startDate, LocalDateTime endDate) {
+    public void addProductToBasket(User user,
+                                   Product product,
+                                   LocalDateTime startDate,
+                                   LocalDateTime endDate
+    ) {
         Loan loan = loanrepository.findByUserId(user.getId())
                 .orElseGet(() -> loanrepository.save(
                         new Loan(user, new ArrayList<>(), 0, startDate, endDate)
@@ -56,9 +63,9 @@ public class LoanServiceImpl implements LoanService {
 
 
 
-    public LoanDTO getLoanById(Long id) {
-        Loan loan = loanrepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Loan not found"));
+    public LoanDTO getLoanByUserId(Long userId) {
+        Loan loan = loanrepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Loan not found for user"));
         return mapToDTO(loan);
     }
 
@@ -113,9 +120,7 @@ public class LoanServiceImpl implements LoanService {
         return new LoanDTO(
                 loan.getId(),
                 loan.getUser().getId(),
-                loan.getProducts().stream() // Gebruik de collectie van producten
-                        .map(Product::getId)    // Haal de IDs van de producten op
-                        .collect(Collectors.toList()), // Verzamel in een lijst
+                loan.getProducts(),
                 loan.getQuantity(),
                 loan.getStartDate(),
                 loan.getEndDate()
@@ -127,10 +132,7 @@ public class LoanServiceImpl implements LoanService {
         loan.setId(loanDTO.getId());
         loan.setUser(userrepository.findById(loanDTO.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("User not found")));
-        loan.setProducts(loanDTO.getProductIds().stream()
-                .map(productId -> productrepository.findById(productId)
-                        .orElseThrow(() -> new IllegalArgumentException("Product not found")))
-                .collect(Collectors.toList()));
+        loan.setProducts(loanDTO.getProducts());
         loan.setQuantity(loanDTO.getQuantity());
         loan.setStartDate(loanDTO.getStartDate());
         loan.setEndDate(loanDTO.getEndDate());

@@ -9,20 +9,24 @@ import be.rungroup.eelucaswillaert.repository.LoanRepository;
 import be.rungroup.eelucaswillaert.repository.ProductRepository;
 import be.rungroup.eelucaswillaert.repository.UserRepository;
 import be.rungroup.eelucaswillaert.service.LoanService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static be.rungroup.eelucaswillaert.service.impl.ProductServiceImpl.mapToProductDto;
 
 @Controller
-@RequestMapping("/loans")
+@Service
+@RequestMapping("/basket")
 public class LoanController {
 
     @Autowired
@@ -36,33 +40,51 @@ public class LoanController {
     @Autowired
     private ProductRepository productRepository;
 
-    @GetMapping("/basket")
-    public ResponseEntity<LoanDTO> basketView(@RequestParam Long userId) {
-        try {
-            // Haal de loan op van de gebruiker
-            Loan loan = loanRepository.findByUserId(userId)
-                    .orElseThrow(() -> new IllegalArgumentException("No basket found for the user"));
-
-            // Map de loan naar een LoanDTO (of een aangepaste response)
-            LoanDTO loanDTO = loanService.getLoanById(loan.getId());
-
-            return ResponseEntity.ok(loanDTO);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(null);
+    @GetMapping
+    public String basketView(Model model) {
+        /*User user = (User) session.getAttribute("loggedUser");
+        if (user == null){
+            model.addAttribute("error", "Je moet ingelogd zijn om je winkelmandje te bekijken.");
+            return "redirect:/login";
         }
+
+        LoanDTO loanDto = loanService.getLoanByUserId(user.getId());
+        model.addAttribute("basket", loanDto);
+        return "/basket/basket-view";
+    */
+
+        // Simuleer een LoanDTO voor testdoeleinden
+        LoanDTO loanDto = new LoanDTO();
+        loanDto.setId(1L);
+        loanDto.setUserId(1L); // Mock user ID
+        loanDto.setProducts(List.of(
+                new Product(1L, "Product A", "Description A", 10, "urlA", List.of()),
+                new Product(2L, "Product B", "Description B", 5, "urlB", List.of())
+        ));
+        loanDto.setQuantity(2);
+        loanDto.setStartDate(LocalDateTime.now());
+        loanDto.setEndDate(LocalDateTime.now().plusDays(7));
+
+        // Voeg de mock basket toe aan het model
+        model.addAttribute("loan", loanDto);
+        return "/basket/basket-view"; // Thymeleaf-template
     }
 
 
-    //TODO: Implementeer deze methode:borrowProduct
     @PostMapping("/basket/add")
     public String addToBasket(
             @RequestParam Long productId,
-            @RequestParam Long userId, // Dit is de ID van de ingelogde gebruiker
             @RequestParam(required = false) String startDate,
             @RequestParam(required = false) String endDate,
-            Principal principal,
+            HttpSession session,
             Model model
     ) {
+        User user = (User) session.getAttribute("loggedUser");
+        if (user == null) {
+            model.addAttribute("error", "You must be logged in to add products to your basket.");
+            return "redirect:/login";
+        }
+
         try {
             // Validatie van de datums
             if (startDate == null || endDate == null || startDate.isEmpty() || endDate.isEmpty()) {
@@ -83,10 +105,6 @@ public class LoanController {
                         .orElseThrow(() -> new IllegalArgumentException("Product not found")));
                 return "products/product-detail"; // Verwijst naar je productdetails-pagina
             }
-
-            // Voeg het product toe aan het winkelmandje
-            User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new IllegalArgumentException("User not found"));
             Product product = productRepository.findById(productId)
                     .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
