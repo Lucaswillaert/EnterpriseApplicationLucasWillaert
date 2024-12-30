@@ -13,4 +13,11 @@ public class GlobalExceptionHandler {
         model.addAttribute("error", ex.getMessage());
         return "error";
     }
+
+    @ExceptionHandler(FileSizeLimitExceededException.class)
+    public String handleFileSizeLimitExceededException(FileSizeLimitExceededException ex, Model model) {
+        model.addAttribute("error", ex.getMessage());
+        return "error";
+    }
+
 }

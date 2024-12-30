@@ -49,12 +49,11 @@
     </div>
     <div class="col-lg-3">
       <div class="card mb-4 mt-4">
-        <div class="card-header">Winkelmand</div>
+        <div class="card-header">Zoek materiaal</div>
         <div class="card-body">
-          <ul class="list-group">
-            <li class="list-group-item">Product 1</li>
-            <li class="list-group-item">Product 2</li>
-          </ul>
+          <form th:action="@{/products/search}" class="form-inline my-2 my-lg-0">
+            <input name="query" class="form-control mr-sm-2" type="search" placeholder="Search materials" aria-label="Search">
+          </form>
         </div>
       </div>
     </div>
