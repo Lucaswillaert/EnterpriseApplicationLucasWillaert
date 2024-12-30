@@ -8,7 +8,7 @@ import java.util.List;
 public interface ProductService {
     List<ProductDto> findAllProducts();
 
-    void saveProduct(ProductDto product);
+    void saveProduct(ProductDto productDto);
 
     ProductDto findById(Long id);
 
@@ -19,4 +19,6 @@ public interface ProductService {
     List<ProductDto> searchProducts(String query);
 
     boolean isProductAvailable(long id);
+
+    byte[] getProductPhoto(Long id);
 }

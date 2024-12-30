@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 
 import lombok.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +30,8 @@ public class Product {
 
     private int totalStock;
 
-    private String photoUrl;
+    @Lob
+    private byte[] photo;
 
     @ElementCollection
     @Enumerated(EnumType.STRING)

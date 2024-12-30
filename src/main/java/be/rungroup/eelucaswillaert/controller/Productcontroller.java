@@ -1,18 +1,23 @@
 package be.rungroup.eelucaswillaert.controller;
 
 import be.rungroup.eelucaswillaert.dto.ProductDto;
+import be.rungroup.eelucaswillaert.exceptions.FileSizeLimitExceededException;
 import be.rungroup.eelucaswillaert.model.Product;
 import be.rungroup.eelucaswillaert.model.Tag;
 
 import be.rungroup.eelucaswillaert.service.ProductService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Controller
@@ -53,18 +58,37 @@ public class Productcontroller {
         return "products/product-create";
     }
 
+    @GetMapping("/products/{id}/photo")
+    public ResponseEntity<byte[]> getProductPhoto(@PathVariable Long id) {
+        byte[] photoBytes = productService.getProductPhoto(id); // Ophalen van bytes
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_PNG) // Of IMAGE_PNG afhankelijk van je type
+                .body(photoBytes);
+    }
+
+
     @PostMapping("/products/new")
-    public String saveProduct(@ModelAttribute ProductDto productDto , BindingResult result, Model model ){
-        if(result.hasErrors()){
-            model.addAttribute("product",productDto);
+    public String saveProduct(@ModelAttribute ProductDto productDto, BindingResult result, Model model) throws IOException {
+        if (result.hasErrors()) {
+            model.addAttribute("product", productDto);
             return "/products/product-create";
         }
-        else {
-            productService.saveProduct(productDto);
-            return "redirect:/products";
+        try {
+            if (productDto.getPhoto() != null && !productDto.getPhoto().isEmpty()) {
+                if (productDto.getPhoto().getSize() > 10 * 1024 * 1024) { // 10 MB
+                    throw new FileSizeLimitExceededException("File size exceeds the 10 MB limit.");
+                }
+                productDto.setPhotoBytes(productDto.getPhoto().getBytes());
+            }
+        } catch (IOException e) {
+            model.addAttribute("error", "Error uploading file");
+            return "/products/product-create";
         }
-
+        productService.saveProduct(productDto);
+        return "redirect:/products/product-list";
     }
+
+
 
     @GetMapping("/products/{id}/edit")
     public String editProductForm(@PathVariable long id, Model model ){
@@ -76,7 +100,7 @@ public class Productcontroller {
 
 
     @PostMapping("/products/{id}/edit")
-    public String editProduct(@ModelAttribute ProductDto productDto, BindingResult result, Model model){
+    public String editProduct(@ModelAttribute ProductDto productDto, BindingResult result, Model model) throws IOException {
         if(result.hasErrors()){
             model.addAttribute("product",productDto);
             return "products/product-edit";
@@ -97,7 +121,7 @@ public class Productcontroller {
     public String SearchCatalogue(@RequestParam(value="query")String query, Model model){
         List<ProductDto> products = productService.searchProducts(query);
         model.addAttribute("products",products);
-        return "product-list";
+        return "/products/product-list";
     }
 
 

@@ -56,7 +56,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductDto> searchProducts(String query) {
-        return List.of();
+        List<Product> products = productrepository.searchProducts(query);
+        return products.stream().map(ProductServiceImpl::mapToProductDto).collect(Collectors.toList());
     }
 
     @Override
@@ -66,6 +67,12 @@ public class ProductServiceImpl implements ProductService {
         return product.getTotalStock() > 0;
     }
 
+    @Override
+    public byte[] getProductPhoto(Long id) {
+        Product product = productrepository.findById(id).orElseThrow(() -> new RuntimeException("Product not found"));
+        return product.getPhoto();
+    }
+
     //mapt een model naar een Data Transfer Object
     public static ProductDto mapToProductDto(Product product) {
         return ProductDto.builder()
@@ -73,20 +80,22 @@ public class ProductServiceImpl implements ProductService {
                 .name(product.getName())
                 .description(product.getDescription())
                 .tags(product.getTags())
-                .photoUrl(product.getPhotoUrl())
+                .photoBytes(product.getPhoto())
                 .totalStock(product.getTotalStock())
                 .build();
     }
 
     //mapt een Data Transfer Object naar een model
-    public static Product mapToProduct(ProductDto product) {
+    public static Product mapToProduct(ProductDto productDto) {
+        System.out.println("Photo set in Product: " + (productDto.getPhoto() != null ? "Yes" : "No"));
+
         return Product.builder()
-                .id(product.getId())
-                .name(product.getName())
-                .description(product.getDescription())
-                .tags(product.getTags())
-                .photoUrl(product.getPhotoUrl())
-                .totalStock(product.getTotalStock())
+                .id(productDto.getId())
+                .name(productDto.getName())
+                .description(productDto.getDescription())
+                .tags(productDto.getTags())
+                .photo(productDto.getPhotoBytes())
+                .totalStock(productDto.getTotalStock())
                 .build();
     }
 }

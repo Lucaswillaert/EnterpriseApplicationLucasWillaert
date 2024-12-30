@@ -7,48 +7,58 @@
     <meta charset="UTF-8">
     <title th:text=" 'Details of' + ${product.name}">Product Details</title>
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/vendor/bootstrap/css/bootstrap.min.css">
+    <style>
+        .card img {
+            max-width: 100%; /* Ensure the image does not exceed the card's width */
+            height: auto; /* Maintain the aspect ratio */
+            border: 1px solid lightgray; /* Optional: Add a border around the image */
+        }
+        .align-bottom {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+        }
+    </style>
 </head>
 <body class="d-flex flex-column">
 
 <!-- Page Content-->
 <section layout:fragment="body">
     <!-- Page content-->
-    <div class="container mt-5 mb-5 ">
-        <div class="card ">
-            <div class="card-body ">
+    <div class="container mt-5 mb-5">
+        <div class="card">
+            <div class="card-body">
                 <div class="row">
-                    <div class="col-lg-5 col-md-5 col-sm-6">
-                        <div class="white-box text-center"><img th:src="${product.photoUrl}" class="img-responsive" alt="photo"></div>
+                    <div class="col-lg-5 col-md-6 col-sm-12 align-bottom">
+                        <div class="white-box text-center">
+                            <img th:src="@{/products/{id}/photo(id=${product.id})}" class="img-responsive" alt="photo">
+                        </div>
                     </div>
-                    <div class="col-lg-7 col-md-7 col-sm-6">
-                        <h3 class="card-title" th:text="${product.name}"> </h3>
+                    <div class="col-lg-7 col-md-6 col-sm-12 align-bottom">
+                        <h3 class="card-title" th:text="${product.name}"></h3>
                         <h6 class="box-title mt-5">Product description</h6>
                         <div class="white-box">
                             <p th:text="${product.description}"></p>
                         </div>
-                        <h2 class="mt-5">
-                        </h2>
+                        <h2 class="mt-5"></h2>
                         <form method="post" th:action="@{/basket/add}" class="d-inline">
-                           <!-- <input type="hidden" th:value="${user.id}" name="userId"/> -->
                             <input type="hidden" th:value="${product.id}" name="productId"/>
-                            <!-- Start Date -->
-                            <label for="startDate">Start Date:</label>
-                            <input type="date" id="startDate" name="startDate" required/>
-                            <br/>
-                            <!-- End Date -->
-                            <label for="endDate">End Date:</label>
-                            <input type="date" id="endDate" name="endDate" required/>
-                            <br/>
-                            <!-- Error Message -->
-                           <!-- <div th:if="${error}" style="color: red;">
-                                <p th:text="${error}"></p>
-                            </div> -->
-                            <button class="btn btn-dark btn-rounded mr-1" type="submit">
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="startDate">Start Date:</label>
+                                    <input type="date" id="startDate" name="startDate" class="form-control" required/>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="endDate">End Date:</label>
+                                    <input type="date" id="endDate" name="endDate" class="form-control" required/>
+                                </div>
+                            </div>
+                            <button class="btn btn-dark btn-rounded mr-1 mt-3" type="submit">
                                 <i class="fa fa-shopping-cart"></i> Add to Basket
                             </button>
                         </form>
-
-
                     </div>
                 </div>
             </div>
@@ -56,5 +66,8 @@
     </div>
 </section>
 
+<script src="/vendor/jquery/jquery.slim.min.js"></script>
+<script src="/vendor/popper/popper.min.js"></script>
+<script src="/vendor/bootstrap/js/bootstrap.min.js"></script>
 </body>
 </html>

@@ -54,7 +54,7 @@ public class LoanController {
     */
 
         // Simuleer een LoanDTO voor testdoeleinden
-        LoanDTO loanDto = new LoanDTO();
+       /* LoanDTO loanDto = new LoanDTO();
         loanDto.setId(1L);
         loanDto.setUserId(1L); // Mock user ID
         loanDto.setProducts(List.of(
@@ -64,9 +64,9 @@ public class LoanController {
         loanDto.setQuantity(2);
         loanDto.setStartDate(LocalDateTime.now());
         loanDto.setEndDate(LocalDateTime.now().plusDays(7));
-
+        */
         // Voeg de mock basket toe aan het model
-        model.addAttribute("loan", loanDto);
+        //model.addAttribute("loan", loanDto);
         return "/basket/basket-view"; // Thymeleaf-template
     }
 
