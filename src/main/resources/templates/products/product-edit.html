@@ -13,7 +13,7 @@
   <section layout:fragment="body" class="py-5">
     <div class="container-fluid">
       <h2>Update the product</h2>
-      <form th:action="@{/products/{id}/edit(id=${product.id})}" th:object="${product}" method="post" enctype="multipart/form-data">
+      <form th:action="@{/products/{id}/edit(id=${product.product_id})}" th:object="${product}" method="post" enctype="multipart/form-data">
         <div class="form-group">
           <label for="photo">Product Photo</label>
           <input

@@ -45,8 +45,8 @@
       <div class="row">
         <div th:each="product : ${products}" class="col-md-4 mb-4">
           <div class="card text center">
-            <a th:href="@{/products/{id}(id=${product.id})}">
-              <img class="card-img-top" th:src="@{/products/{id}/photo(id=${product.id})}" alt="Card image cap">
+            <a th:href="@{/products/{id}(id=${product.product_id})}">
+              <img class="card-img-top" th:src="@{/products/{id}/photo(id=${product.product_id})}" alt="Card image cap">
               <div class="card-body">
                 <h5 class="card-title" th:text="${product.name}">Card title</h5>
               </div>

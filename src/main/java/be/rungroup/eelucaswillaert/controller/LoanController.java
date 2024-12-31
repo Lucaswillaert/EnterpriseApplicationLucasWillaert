@@ -1,8 +1,10 @@
 package be.rungroup.eelucaswillaert.controller;
 
 import be.rungroup.eelucaswillaert.dto.LoanDTO;
+import be.rungroup.eelucaswillaert.dto.LoanItemDto;
 import be.rungroup.eelucaswillaert.dto.ProductDto;
 import be.rungroup.eelucaswillaert.model.Loan;
+import be.rungroup.eelucaswillaert.model.LoanItem;
 import be.rungroup.eelucaswillaert.model.Product;
 import be.rungroup.eelucaswillaert.model.User;
 import be.rungroup.eelucaswillaert.repository.LoanRepository;
@@ -44,6 +46,8 @@ public class LoanController {
 
     @Autowired
     private ProductRepository productRepository;
+    @Autowired
+    private Product product;
 
 
     @GetMapping
@@ -51,31 +55,34 @@ public class LoanController {
 
         User user = (User) session.getAttribute("loggedUser");
         if (user == null) {
-            return "redirect:/login"; // Of maak een mock-gebruiker
+            // Mock-gebruiker aanmaken
+            final User mockUser = new User();
+            mockUser.setId(1L); // Gebruik een fictief ID
+            mockUser.setVoornaam("John");
+            mockUser.setAchternaam("Doe");
+            mockUser.setEmail("john.Doe@gmail.com");
+            mockUser.setPassword("password");
+            mockUser.setAdmin(false);
+            user = mockUser;
+        // User user = (User) session.getAttribute("loggedUser");
+        //if (user == null) {
+            //return "redirect:/login"; // Redirect naar login indien geen gebruiker ingelogd
         }
+        final User finalUser = user;
+        Loan loan = loanRepository.findByUserId(finalUser.getId())
+                .orElseGet(() -> loanRepository.save(new Loan(finalUser, new ArrayList<>())));
 
-        /*if (loan == null) {
-            loan = new Loan();
-            loan.setProducts(new ArrayList<>());
-            session.setAttribute("basket", loan);
-        }*/
+        LoanDTO loanDTO = loanService.getLoanByUserId(finalUser.getId());
+        model.addAttribute("loan", loanDTO);
 
-        Loan loan = loanRepository.findByUserId(user.getId())
-                .orElseGet(() -> {
-                    Loan newLoan = new Loan(user, new ArrayList<>(), 0, LocalDateTime.now(), LocalDateTime.now().plusDays(1));
-                    loanRepository.save(newLoan);
-                    return newLoan;
-                });
-
-        model.addAttribute("loan", loan);
         return "basket/basket-view"; // Thymeleaf-template
     }
 
     @PostMapping("/add")
     public String addToBasket(
-            @RequestParam Long productId,
-            @RequestParam String startDate,
-            @RequestParam String endDate,
+            @RequestParam("product_id") Long product_id,
+            @RequestParam("startDate") String startDate,
+            @RequestParam("endDate") String endDate,
             HttpSession session,
             Model model
     ) {
@@ -97,31 +104,34 @@ public class LoanController {
             user.setAdmin(false);
             session.setAttribute("loggedUser", user); // Voeg mock-gebruiker toe aan de sessie
         } try {
+            logger.error("we zitten nu voor de local datum validatie ");
             // Datum validatie
             LocalDateTime start = LocalDate.parse(startDate).atStartOfDay();
             LocalDateTime end = LocalDate.parse(endDate).atStartOfDay();
+            LocalDateTime now = LocalDateTime.now();
             if (end.isBefore(start)) {
                 model.addAttribute("error", "De einddatum moet na de startdatum liggen.");
-                model.addAttribute("product", productRepository.findById(productId)
+                model.addAttribute("product", productRepository.findById(product_id)
+                        .orElseThrow(() -> new IllegalArgumentException("Product niet gevonden")));
+                return "products/product-detail";
+            } else if (start.isBefore(now) || end.isBefore(now)) {
+                model.addAttribute("error", "De startdatum en einddatum mogen niet in het verleden liggen.");
+                model.addAttribute("product", productRepository.findById(product_id)
                         .orElseThrow(() -> new IllegalArgumentException("Product niet gevonden")));
                 return "products/product-detail";
             }
-            Product product = productRepository.findById(productId)
-                    .orElseThrow(() -> new IllegalArgumentException("Product niet gevonden"));
-            // Haal of maak het winkelmandje in de sessie
-            Loan loan = (Loan) session.getAttribute("basket");
-            if (loan == null) {
-                loan = new Loan(user, new ArrayList<>(), 0, start, end);
-                session.setAttribute("basket", loan);
-            }
-            loanService.addProductToBasket(user, product, start, end);
 
+            logger.error("Product toevoegen aan winkelmandje: product_id={}, start={}, end={}", product_id, start, end);
+            loanService.addProductToBasket(user.getId(), product_id, start, end);
+
+            logger.error("Product toegevoegd aan winkelmandje: product_id={},productName={}, start={}, end={}", product_id,product.getName(), start, end);
             return "redirect:/basket";
 
         } catch (Exception e) {
             e.printStackTrace();
+            System.out.println("Er is een fout opgetreden: " + e.getMessage());
             model.addAttribute("error", "Er is een fout opgetreden: " + e.getMessage());
-            System.out.println("------------Er is een fout opgetreden: " + e.getMessage() + "------------");
+            logger.error("Er is een fout opgetreden bij het toevoegen aan de basket: {}", e.getMessage());
             return "products/product-detail";
         }
     }
@@ -141,15 +151,22 @@ public class LoanController {
                 user.setAdmin(false);
                 session.setAttribute("loggedUser", user); // Add mock user to session
             }
+            try {
+            Loan loan = loanRepository.findByUserId(user.getId())
+                    .orElseThrow(() -> new IllegalArgumentException("Loan not found for user"));
 
-        Loan loan = loanRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Loan not found for user"));
+            LoanItem loanItem = loan.getLoanItems().stream()
+                    .filter(item -> item.getProduct().getProduct_id().equals(productId))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("Product niet gevonden in basket"));
 
-        loan.getProducts().removeIf(product -> product.getId().equals(productId));
-        loan.setQuantity(loan.getQuantity() - 1);
-        loanRepository.save(loan);
+            loanService.returnProduct(loan.getLoan_id(), productId);
+            return "redirect:/basket";
 
-        return "redirect:/basket";
+        } catch (Exception e) {
+            logger.error("Er is een fout opgetreden bij het verwijderen uit de basket: {}", e.getMessage());
+            return "redirect:/basket?error=" + e.getMessage();
+        }
     }
 
 

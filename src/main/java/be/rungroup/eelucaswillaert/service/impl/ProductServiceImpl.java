@@ -76,7 +76,7 @@ public class ProductServiceImpl implements ProductService {
     //mapt een model naar een Data Transfer Object
     public static ProductDto mapToProductDto(Product product) {
         return ProductDto.builder()
-                .id(product.getId())
+                .product_id(product.getProduct_id())
                 .name(product.getName())
                 .description(product.getDescription())
                 .tags(product.getTags())
@@ -90,7 +90,7 @@ public class ProductServiceImpl implements ProductService {
         System.out.println("Photo set in Product: " + (productDto.getPhoto() != null ? "Yes" : "No"));
 
         return Product.builder()
-                .id(productDto.getId())
+                .product_id(productDto.getProduct_id())
                 .name(productDto.getName())
                 .description(productDto.getDescription())
                 .tags(productDto.getTags())

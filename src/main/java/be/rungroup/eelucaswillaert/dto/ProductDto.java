@@ -22,7 +22,7 @@ import java.util.List;
 @NoArgsConstructor
 public class ProductDto {
 
-    private Long id;
+    private Long product_id;
     @NotBlank(message = "Name is mandatory")
     private String name;
 

@@ -31,22 +31,13 @@ public class Productcontroller {
         this.productService = productService;
     }
 
-    @GetMapping("/products")
+    @GetMapping("/products/product-list")
     public String showAllProducts(Model model) {
         List<ProductDto> products= productService.findAllProducts();
         model.addAttribute("products",products);
+        model.addAttribute("tags", Tag.values());
 
         return "/products/product-list";
-    }
-
-    @GetMapping("/products/{id}")
-    public String productDetail(@PathVariable long id, Model model) {
-        ProductDto productDto = productService.findById(id);
-        if (productDto == null) {
-            throw new RuntimeException("Product not found with id: " + id);
-        }
-        model.addAttribute("product", productDto);
-        return "products/product-detail";
     }
 
     @GetMapping("/products/new")
@@ -63,6 +54,16 @@ public class Productcontroller {
         return ResponseEntity.ok()
                 .contentType(MediaType.IMAGE_PNG) // Of IMAGE_PNG afhankelijk van je type
                 .body(photoBytes);
+    }
+
+    @GetMapping("/products/{id:[0-9]+}")
+    public String productDetail(@PathVariable long id, Model model) {
+        ProductDto productDto = productService.findById(id);
+        if (productDto == null) {
+            throw new RuntimeException("Product not found with id: " + id);
+        }
+        model.addAttribute("product", productDto);
+        return "products/product-detail";
     }
 
     @PostMapping("/products/new")

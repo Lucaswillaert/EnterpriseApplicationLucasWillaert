@@ -23,33 +23,21 @@ public class Loan implements java.io.Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "loan_id")
+    private Long loan_id;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToMany
-    @JoinTable(
-            name = "loan_products",
-            joinColumns = @JoinColumn(name = "loan_id"),
-            inverseJoinColumns = @JoinColumn(name = "product_id")
-    )
-    private List<Product> products = new ArrayList<>();
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+
+    @OneToMany(mappedBy = "loan", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<LoanItem> loanItems = new ArrayList<>();
 
 
-    private int quantity;
-
-
-    public Loan (User user, List<Product> products, int quantity, LocalDateTime startDate, LocalDateTime endDate) {
+    public Loan (User user, List<LoanItem> loanItems) {
         this.user = user;
-        this.products = products;
-        this.quantity = quantity;
-        this.startDate = startDate;
-        this.endDate = endDate;
-
+        this.loanItems = loanItems;
     }
 
 

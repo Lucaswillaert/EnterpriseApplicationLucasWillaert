@@ -22,7 +22,7 @@ import java.util.List;
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long product_id;
 
     private String name;
 
@@ -33,7 +33,12 @@ public class Product {
     @Lob
     private byte[] photo;
 
+
     @ElementCollection
+    @CollectionTable(
+            name = "product_tags",
+            joinColumns = @JoinColumn(name = "product_id", referencedColumnName = "product_id")
+    )
     @Enumerated(EnumType.STRING)
     private List<Tag> tags = new ArrayList<>();
 

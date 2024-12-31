@@ -30,10 +30,17 @@
     <div class="container mt-5 mb-5">
         <div class="card">
             <div class="card-body">
+                <div th:if="${product == null}">
+                    <p>Product niet gevonden. Ga terug naar de <a th:href="@{/products/product-list}">productlijst</a>.</p>
+                </div>
+                <div th:if="${error}">
+                    <div class="alert alert-danger" th:text="${error}"></div>
+                </div>
+
                 <div class="row">
                     <div class="col-lg-5 col-md-6 col-sm-12 align-bottom">
                         <div class="white-box text-center">
-                            <img th:src="@{/products/{id}/photo(id=${product.id})}" class="img-responsive" alt="photo">
+                            <img th:src="@{/products/{id}/photo(id=${product.product_id})}" class="img-responsive" alt="photo">
                         </div>
                     </div>
                     <div class="col-lg-7 col-md-6 col-sm-12 align-bottom">
@@ -44,7 +51,7 @@
                         </div>
                         <h2 class="mt-5"></h2>
                         <form method="post" th:action="@{/basket/add}" class="d-inline">
-                            <input type="hidden" th:value="${product.id}" name="productId"/>
+                            <input type="hidden" th:value="${product.product_id}" name="product_id"/>
                             <div class="form-row">
                                 <div class="form-group col-md-6">
                                     <label for="startDate">Start Date:</label>

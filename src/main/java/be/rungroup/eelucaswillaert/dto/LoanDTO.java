@@ -1,5 +1,6 @@
 package be.rungroup.eelucaswillaert.dto;
 
+import be.rungroup.eelucaswillaert.model.LoanItem;
 import be.rungroup.eelucaswillaert.model.Product;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,11 +14,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LoanDTO {
-    private Long id;
+    private Long loan_id;
     private Long userId;
-    private List<Product> products; // Lijst van product-IDs
-    private int quantity;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+    private List<LoanItemDto> loanItems; // Lijst van product-IDs
 }
 
