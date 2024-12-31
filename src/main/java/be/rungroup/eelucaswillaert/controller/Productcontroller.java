@@ -38,7 +38,6 @@ public class Productcontroller {
 
         return "/products/product-list";
     }
-    //TODO: add ALL API endpoints for the ProductController
 
     @GetMapping("/products/{id}")
     public String productDetail(@PathVariable long id, Model model) {
@@ -66,7 +65,6 @@ public class Productcontroller {
                 .body(photoBytes);
     }
 
-
     @PostMapping("/products/new")
     public String saveProduct(@ModelAttribute ProductDto productDto, BindingResult result, Model model) throws IOException {
         if (result.hasErrors()) {
@@ -87,8 +85,6 @@ public class Productcontroller {
         productService.saveProduct(productDto);
         return "redirect:/products/product-list";
     }
-
-
 
     @GetMapping("/products/{id}/edit")
     public String editProductForm(@PathVariable long id, Model model ){

@@ -35,7 +35,7 @@
                 <tr>
                   <td>
                     <div class="d-flex align-items-center">
-                      <img th:src="${product.photoUrl}" alt="" style="width: 50px; height: 50px" class="rounded-circle"/>
+                      <img th:src="@{/products/{id}/photo(id=${product.id})}" alt="" style="width: 50px; height: 50px" class="rounded-circle"/>
                       <div class="ms-3">
                         <p class="fw-bold mb-1" th:text="${product.name}"></p>
                         <p class="text-muted mb-0 truncate" th:text="${product.description}"></p>
@@ -43,25 +43,43 @@
                     </div>
                   </td>
 
+
                   <td>
-                    <!--<span class="badge badge-success rounded-pill d-inline" th:text="${#dates.format(loan.startDate, 'yyyy-MM-dd')}"></span> -->
+                    <span class="badge badge-success rounded-pill d-inline" th:text="${#dates.format(loan.startDate, 'yyyy-MM-dd')}"></span>
                   </td>
                   <td>
-                    <!-- <span class="badge badge-success rounded-pill d-inline" th:text="${#dates.format(loan.endDate, 'yyyy-MM-dd')}"></span> -->
+                    <span class="badge badge-success rounded-pill d-inline" th:text="${#dates.format(loan.endDate, 'yyyy-MM-dd')}"></span>
                   </td>
                   <td>
-                    <button type="button" class="btn btn-link btn-sm btn-rounded">delete from Basket</button>
+                    <form th:action="@{/basket/remove}" method="post">
+                      <input type="hidden" name="productId" th:value="${product.id}" />
+                      <button type="submit">Verwijder</button>
+                    </form>
                   </td>
                 </tr>
               </th:block>
               </tbody>
             </table>
           </div>
+
+          <div th:if="${loan.products.size() == 0}">
+            <p>Je winkelmandje is leeg.</p>
+          </div>
+
         </div>
       </div>
     </div>
   </div>
+
+  <div>
+    <a th:href="@{/products}">Verder winkelen</a>
+    <form th:action="@{/basket/checkout}" method="post" th:if="${loan.products.size() > 0}">
+      <button type="submit">Afrekenen</button>
+    </form>
+  </div>
+
+
 </section>
 
 </body>
-</html></html>
+</html>

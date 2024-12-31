@@ -3,6 +3,8 @@ package be.rungroup.eelucaswillaert.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.io.Serial;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +16,11 @@ import java.util.List;
 @Setter
 @Getter
 @Entity
-public class Loan {
+public class Loan implements java.io.Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
