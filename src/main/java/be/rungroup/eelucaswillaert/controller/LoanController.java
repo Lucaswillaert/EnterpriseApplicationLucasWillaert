@@ -96,25 +96,18 @@ public class LoanController {
             user.setPassword("password");
             user.setAdmin(false);
             session.setAttribute("loggedUser", user); // Voeg mock-gebruiker toe aan de sessie
-        }
-
-        try {
+        } try {
             // Datum validatie
             LocalDateTime start = LocalDate.parse(startDate).atStartOfDay();
             LocalDateTime end = LocalDate.parse(endDate).atStartOfDay();
-
             if (end.isBefore(start)) {
                 model.addAttribute("error", "De einddatum moet na de startdatum liggen.");
                 model.addAttribute("product", productRepository.findById(productId)
                         .orElseThrow(() -> new IllegalArgumentException("Product niet gevonden")));
                 return "products/product-detail";
             }
-
             Product product = productRepository.findById(productId)
                     .orElseThrow(() -> new IllegalArgumentException("Product niet gevonden"));
-
-
-
             // Haal of maak het winkelmandje in de sessie
             Loan loan = (Loan) session.getAttribute("basket");
             if (loan == null) {
@@ -135,12 +128,28 @@ public class LoanController {
 
     @PostMapping("/remove")
     public String removeFromBasket(@RequestParam Long productId, HttpSession session) {
-        Loan loan = (Loan) session.getAttribute("basket");
-        if (loan != null) {
-            loan.getProducts().removeIf(product -> product.getId().equals(productId));
-            session.setAttribute("basket", loan); // Werk de sessie bij
-        }
-        return "redirect:/basket/view";
+        User user = (User) session.getAttribute("loggedUser");
+
+            if (user == null) {
+                // Mock user creation
+                user = new User();
+                user.setId(1L); // Use a fictitious ID
+                user.setVoornaam("John");
+                user.setAchternaam("Doe");
+                user.setEmail("john.Doe@gmail.com");
+                user.setPassword("password");
+                user.setAdmin(false);
+                session.setAttribute("loggedUser", user); // Add mock user to session
+            }
+
+        Loan loan = loanRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Loan not found for user"));
+
+        loan.getProducts().removeIf(product -> product.getId().equals(productId));
+        loan.setQuantity(loan.getQuantity() - 1);
+        loanRepository.save(loan);
+
+        return "redirect:/basket";
     }
 
 
