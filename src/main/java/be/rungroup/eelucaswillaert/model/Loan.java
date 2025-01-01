@@ -28,10 +28,12 @@ public class Loan implements java.io.Serializable {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @ToString.Exclude // Prevent stack overflow
     private User user;
 
 
     @OneToMany(mappedBy = "loan", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude // Prevent stack overflow
     private List<LoanItem> loanItems = new ArrayList<>();
 
 

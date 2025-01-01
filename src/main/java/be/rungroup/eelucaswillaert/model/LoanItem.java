@@ -16,6 +16,7 @@ public class LoanItem {
 
     @ManyToOne
     @JoinColumn(name = "loan_id" , referencedColumnName = "loan_id", nullable = false)
+    @ToString.Exclude
     private Loan loan;
 
     @ManyToOne
@@ -23,10 +24,8 @@ public class LoanItem {
     private Product product;
 
     private int quantity;
-
     private LocalDateTime startDate;
     private LocalDateTime endDate;
-
 
     public LoanItem(Product product, int quantity, LocalDateTime startDate, LocalDateTime endDate) {
         this.product = product;

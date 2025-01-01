@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.time.LocalDateTime;
 
@@ -16,6 +18,6 @@ import java.time.LocalDateTime;
 public class LoanDTO {
     private Long loan_id;
     private Long userId;
-    private List<LoanItemDto> loanItems; // Lijst van product-IDs
+    private List<LoanItemDto> loanItems = new ArrayList<>(); // Lijst van product-IDs
 }
 

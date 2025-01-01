@@ -137,7 +137,7 @@ public class LoanController {
     }
 
     @PostMapping("/remove")
-    public String removeFromBasket(@RequestParam Long productId, HttpSession session) {
+    public String removeFromBasket(@RequestParam("product_id") Long product_id, HttpSession session) {
         User user = (User) session.getAttribute("loggedUser");
 
             if (user == null) {
@@ -156,11 +156,11 @@ public class LoanController {
                     .orElseThrow(() -> new IllegalArgumentException("Loan not found for user"));
 
             LoanItem loanItem = loan.getLoanItems().stream()
-                    .filter(item -> item.getProduct().getProduct_id().equals(productId))
+                    .filter(item -> item.getProduct().getProduct_id().equals(product_id))
                     .findFirst()
                     .orElseThrow(() -> new IllegalArgumentException("Product niet gevonden in basket"));
 
-            loanService.returnProduct(loan.getLoan_id(), productId);
+            loanService.returnProduct(loan.getLoan_id(), product_id);
             return "redirect:/basket";
 
         } catch (Exception e) {

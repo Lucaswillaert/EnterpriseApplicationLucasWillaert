@@ -14,6 +14,10 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
+    .date-text {
+      color: black;
+      font-size: 0.9em;
+    }
   </style>
 </head>
 <body class="d-flex flex-column">
@@ -21,12 +25,11 @@
 <!-- Page Content-->
 <section layout:fragment="body">
   <!-- Page content-->
-  <h1>Basket</h1>
   <div class="container-fluid">
     <div class="row">
       <div class="col-lg-12">
         <div class="card mb-4 mt-4">
-          <div class="card-header">Winkelmand</div>
+          <div class="card-header">Geselecteerde Materiaal</div>
           <div class="card-body">
             <!-- Controleer of de winkelmand leeg is -->
             <div th:if="${loan == null || loan.loanItems.size() == 0}">
@@ -36,29 +39,31 @@
 
             <table class="table align-middle mb-0 bg-white" th:if="${loan != null && loan.loanItems.size() > 0}">
               <tbody>
-              <th:block th:if="${loan != null}" th:each="product : ${loan.loanItems}">
-                <tr th:each="product: ${loan.loanItems}" >
+              <th:block th:if="${loan != null}" th:each="item : ${loan.loanItems}">
+                <tr th:each="item: ${loan.loanItems}" >
                   <td>
                     <div class="d-flex align-items-center">
-                      <img th:src="@{/products/{id}/photo(id=${product.product.product_id})}" alt="" style="width: 50px; height: 50px" class="rounded-circle"/>
+                      <img th:src="@{/products/{id}/photo(id=${item.product.product_id})}" alt="" style="width: 50px; height: 50px" class="rounded-circle"/>
                       <div class="ms-3">
-                        <p class="fw-bold mb-1" th:text="${product.product?.name ?:'naam ontbreekt'}"></p>
-                        <p class="text-muted mb-0 truncate" th:text="${product.product.description}"></p>
+                        <p class="fw-bold mb-1" th:text="${item.product?.name ?:'naam ontbreekt'}"></p>
+                        <p class="text-muted mb-0 truncate" th:text="${item.product.description}"></p>
                       </div>
                     </div>
                   </td>
 
 
                   <td>
-                    <!-- <span class="badge badge-success rounded-pill d-inline" th:text="${#dates.format(loan.startDate, 'yyyy-MM-dd')}"></span> -->
+                    <span class="date-text badge badge-success rounded-pill d-inline">van <span th:text="${#temporals.format(item.startDate, 'dd-MM-yyyy')}"></span></span>
                   </td>
                   <td>
-                    <!-- <span class="badge badge-success rounded-pill d-inline" th:text="${#dates.format(loan.endDate, 'yyyy-MM-dd')}"></span> -->
+                    <span class="date-text badge badge-success rounded-pill d-inline">tot <span th:text="${#temporals.format(item.endDate, 'dd-MM-yyyy')}"></span></span>
                   </td>
                   <td>
                     <form th:action="@{/basket/remove}" method="post">
-                      <input type="hidden" name="productId" th:value="${product.product.product_id}" />
-                      <button type="submit">Verwijder</button>
+                      <input type="hidden" name="product_id" th:value="${item.product.product_id}" />
+                      <button type="submit" class="btn btn-link text-danger p-0">
+                        <i class="fa fa-times"></i>
+                      </button>
                     </form>
                   </td>
                 </tr>
@@ -71,9 +76,9 @@
     </div>
   </div>
 
-  <div>
-    <form th:action="@{/basket/checkout}" method="post" th:if="${loan.loanItems.size() > 0}">
-      <button type="submit">Afrekenen</button>
+  <div class="d-flex justify-content-end mt-4 mb-5">
+    <form th:action="@{/basket/checkout}" method="post" th:if="${loan != null && loan.loanItems != null && loan.loanItems.size() > 0}">
+      <button type="submit" class="btn btn-primary">Confirmeren</button>
     </form>
   </div>
 

@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.List;
 
 @Entity
 @Getter
@@ -27,8 +28,9 @@ public class User implements Serializable {
     private String password;
     private boolean isAdmin;
 
-    //@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    //    private List<Loan> loans = new ArrayList<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,  orphanRemoval = true)
+    @ToString.Exclude // Prevent stack overflow
+    private List<Loan> loans;
 
 
 }
