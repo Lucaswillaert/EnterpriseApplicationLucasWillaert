@@ -20,6 +20,13 @@
             justify-content: space-between;
             height: 100%;
         }
+        .out-of-stock-banner {
+            background-color: red;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body class="d-flex flex-column">
@@ -35,6 +42,9 @@
                 </div>
                 <div th:if="${error}">
                     <div class="alert alert-danger" th:text="${error}"></div>
+                </div>
+                <div th:if="${product.totalStock == 0}" class="out-of-stock-banner">
+                    Materiaal is uit stock, hou deze pagina in de gaten of contacteer de administrator
                 </div>
 
                 <div class="row">
@@ -62,7 +72,7 @@
                                     <input type="date" id="endDate" name="endDate" class="form-control" required/>
                                 </div>
                             </div>
-                            <button class="btn btn-dark btn-rounded mr-1 mt-3" type="submit">
+                            <button class="btn btn-dark btn-rounded mr-1 mt-3" type="submit" th:disabled="${product.totalStock == 0}">
                                 <i class="fa fa-shopping-cart"></i> Add to Basket
                             </button>
                         </form>
