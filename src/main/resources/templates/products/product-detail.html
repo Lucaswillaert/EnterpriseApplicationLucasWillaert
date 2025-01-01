@@ -27,6 +27,16 @@
             text-align: center;
             font-weight: bold;
         }
+        .tag-button {
+            display: inline-block;
+            padding: 5px 10px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 15px;
+            background-color: #f8f9fa;
+            color: #333;
+            text-decoration: none;
+        }
     </style>
 </head>
 <body class="d-flex flex-column">
@@ -55,6 +65,9 @@
                     </div>
                     <div class="col-lg-7 col-md-6 col-sm-12 align-bottom">
                         <h3 class="card-title" th:text="${product.name}"></h3>
+                        <div>
+                            <span th:each="tag : ${product.tags}" class="tag-button" th:text="${#strings.replace(tag, '_', ' ')}"></span>
+                        </div>
                         <h6 class="box-title mt-5">Product description</h6>
                         <div class="white-box">
                             <p th:text="${product.description}"></p>
