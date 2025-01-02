@@ -56,9 +56,10 @@ public class AuthController {
     }
 
     @GetMapping("/profile")
-    public String profilePage(Model model, HttpSession session) {
+    public String profilePage(Model model, HttpSession session, HttpServletRequest request) {
         User user = (User) session.getAttribute("loggedUser");
         model.addAttribute("user", user);
+        model.addAttribute("currentUri", request.getRequestURI());
         return "/user/user-profile";
     }
 
