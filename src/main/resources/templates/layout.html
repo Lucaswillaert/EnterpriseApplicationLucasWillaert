@@ -49,7 +49,9 @@
         <a class="nav-link" th:href="@{/products/product-list}">Uitleendienst </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" th:href="@{/products/new}">Add a new Product</a>
+        <div th:if="${session.loggedUser != null and session.loggedUser.isAdmin}">
+          <a class="nav-link" th:href="@{/products/new}">Create a New Product</a>
+        </div>
       </li>
     </ul>
   </div>

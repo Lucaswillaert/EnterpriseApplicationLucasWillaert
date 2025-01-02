@@ -63,6 +63,7 @@ public class AuthController {
         user.setPassword(registrationDto.getPassword());
         user.setFirstName(registrationDto.getFirstName());
         user.setLastName(registrationDto.getLastName());
+        user.setAdmin(false);
         userRepository.save(user);
         return "redirect:/login";
     }
