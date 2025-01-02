@@ -38,7 +38,7 @@
     <img src="/assets/ritcs.png" width="100" height="70"  class="d-inline-block align-top" alt="">
   </a>
 
-  <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
+  <div th:if="${currentUri != '/login' and currentUri != '/register'}" class="collapse navbar-collapse" id="navbarTogglerDemo03">
     <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
       <li class="nav-item active">
         <a class="nav-link" th:href="@{/products/product-list}">Uitleendienst </a>
@@ -48,12 +48,12 @@
       </li>
     </ul>
   </div>
-  <ul class="navbar-nav ml-auto mt-3 mt-lg-0">
+  <ul th:if="${currentUri != '/login' and currentUri != '/register'}" class="navbar-nav ml-auto mt-3 mt-lg-0">
     <li class="nav-item">
-      <a class="nav-link" th:href="@{/basket}">Winkelmand</a>
+      <a class="nav-link" th:href="@{/basket}">Basket</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" href="#">Login</a>
+      <a class="nav-link" href="#">Account</a>
     </li>
   </ul>
 </nav>
@@ -64,7 +64,7 @@
     <div class="col-lg-9">
       <div layout:fragment="body"></div>
     </div>
-    <div class="col-lg-3">
+    <div th:if="${currentUri != '/login' and currentUri != '/register'}" class="col-lg-3">
       <div class="card mb-4 mt-4">
         <div class="card-header">Zoek materiaal</div>
         <div class="card-body">

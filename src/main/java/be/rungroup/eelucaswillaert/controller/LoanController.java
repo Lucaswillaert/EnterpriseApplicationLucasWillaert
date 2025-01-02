@@ -58,8 +58,6 @@ public class LoanController {
             // Mock-gebruiker aanmaken
             final User mockUser = new User();
             mockUser.setId(1L); // Gebruik een fictief ID
-            mockUser.setVoornaam("John");
-            mockUser.setAchternaam("Doe");
             mockUser.setEmail("john.Doe@gmail.com");
             mockUser.setPassword("password");
             mockUser.setAdmin(false);
@@ -97,8 +95,6 @@ public class LoanController {
             // Mock-gebruiker aanmaken
             user = new User();
             user.setId(1L); // Gebruik een fictief ID
-            user.setVoornaam("John");
-            user.setAchternaam("Doe");
             user.setEmail("john.Doe@gmail.com");
             user.setPassword("password");
             user.setAdmin(false);
@@ -144,8 +140,6 @@ public class LoanController {
                 // Mock user creation
                 user = new User();
                 user.setId(1L); // Use a fictitious ID
-                user.setVoornaam("John");
-                user.setAchternaam("Doe");
                 user.setEmail("john.Doe@gmail.com");
                 user.setPassword("password");
                 user.setAdmin(false);

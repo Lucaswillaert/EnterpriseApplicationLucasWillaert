@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+  <link rel="stylesheet" href="/vendor/bootstrap/css/bootstrap.min.css">
+  <style>
+    .login-container {
+      max-width: 400px;
+      padding: 2rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background-color: #f9f9f9;
+    }
+    .login-container .form-control {
+      margin-bottom: 1rem;
+    }
+    .login-container .btn-primary {
+      color: #fff;
+      background-color: #6c757d;
+      border-color: #6c757d;
+    }
+    .login-container .btn-secondary {
+      color: #fff;
+      background-color: #adb5bd;
+      border-color: #adb5bd;
+    }
+  </style>
+</head>
+<body class="d-flex flex-column h-100">
+<main class="flex-shrink-0">
+  <div th:if="${param.error}" class="alert alert-danger">
+    Invalid email and password.
+  </div>
+  <div th:if="${param.logout}" class="alert alert-warning">
+    You have been logged out.
+  </div>
+  <!-- Page Content-->
+  <section layout:fragment="body" class="py-5">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+          <div class="login-container">
+            <h2 class="text-center mb-4">Uitleendienst RITCS</h2>
+            <form role="form" method="post" th:action="@{/login}">
+              <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input
+                        type="text"
+                        class="form-control"
+                        id="email"
+                        name="email">
+              </div>
+              <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input
+                        type="password"
+                        class="form-control"
+                        id="password"
+                        name="password">
+              </div>
+              <div class="d-flex justify-content-between">
+                <button type="submit" class="btn btn-primary">Login</button>
+                <a th:href="@{/register}" class="btn btn-secondary">Register Here!</a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+</body>
+</html>
