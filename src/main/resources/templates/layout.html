@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="/vendor/bootstrap/css/bootstrap.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet"/>
 
-  <title layout:title-pattern="$CONTENT_TITLE - $LAYOUT_TITLE">Lending Service RITCS</title>
+  <title layout:title-pattern="\$CONTENT_TITLE - \$LAYOUT_TITLE">Lending Service RITCS</title>
 
   <style>
     .filter-sidebar {
@@ -75,7 +75,7 @@
     <div class="col-lg-9">
       <div layout:fragment="body"></div>
     </div>
-    <div th:if="${currentUri == '/products/product-list'}" class="col-lg-3">
+    <div th:if="${currentUri.startsWith('/products/product-list') or currentUri.startsWith('/products/filter') or currentUri.startsWith('/products/search')}" class="col-lg-3">
       <div class="card mb-4 mt-4">
         <div class="card-header">Zoek materiaal</div>
         <div class="card-body">
@@ -96,7 +96,7 @@
   </div>
 
   <!-- Filter Sidebar -->
-  <div th:if="${currentUri == '/products/product-list'}" class="filter-sidebar" id="filterSidebar">
+  <div th:if="${currentUri.startsWith('/products/product-list') or currentUri.startsWith('/products/filter') or currentUri.startsWith('/products/search')}" class="filter-sidebar" id="filterSidebar">
     <div class="p-4">
       <h5>Filter by Tags</h5>
       <form id="filterForm" th:action="@{/products/filter}" method="get">

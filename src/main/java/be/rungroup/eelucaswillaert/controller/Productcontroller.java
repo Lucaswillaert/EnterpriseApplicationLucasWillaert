@@ -45,11 +45,12 @@ public class Productcontroller {
     }
 
     @GetMapping("/products/new")
-    public String createProductForm(Model model){
+    public String createProductForm(Model model, HttpServletRequest request){
         Product product = new Product();
         model.addAttribute("product", product);
         model.addAttribute("tags", Tag.values());
         model.addAttribute("selectedTags", new ArrayList<>());
+        model.addAttribute("currentUri", request.getRequestURI());
         return "products/product-create";
     }
 
@@ -62,12 +63,13 @@ public class Productcontroller {
     }
 
     @GetMapping("/products/{id:[0-9]+}")
-    public String productDetail(@PathVariable long id, Model model) {
+    public String productDetail(@PathVariable long id, Model model, HttpServletRequest request) {
         ProductDto productDto = productService.findById(id);
         if (productDto == null) {
             throw new RuntimeException("Product not found with id: " + id);
         }
         model.addAttribute("product", productDto);
+        model.addAttribute("currentUri",request.getRequestURI());
         return "products/product-detail";
     }
 
@@ -119,14 +121,17 @@ public class Productcontroller {
     }
 
     @GetMapping("/products/search")
-    public String SearchCatalogue(@RequestParam(value="query")String query, Model model){
+    public String SearchCatalogue(@RequestParam(value="query")String query, Model model, HttpServletRequest request){
         List<ProductDto> products = productService.searchProducts(query);
         model.addAttribute("products",products);
+        model.addAttribute("tags", Tag.values());
+        model.addAttribute("selectedTags", new ArrayList<>());
+        model.addAttribute("currentUri", request.getRequestURI());
         return "/products/product-list";
     }
 
     @GetMapping("/products/filter")
-    public String filterProducts(@RequestParam(value="tags", required = false) List<String> tags, Model model){
+    public String filterProducts(@RequestParam(value="tags", required = false) List<String> tags, Model model, HttpServletRequest request){
         List<ProductDto> products;
         if(tags == null || tags.isEmpty()){
             products = productService.findAllProducts();
@@ -136,6 +141,7 @@ public class Productcontroller {
         model.addAttribute("products", products);
         model.addAttribute("tags", Tag.values());
         model.addAttribute("selectedTags", tags != null ? tags : new ArrayList<>());
+        model.addAttribute("currentUri", request.getRequestURI());
         return "/products/product-list";
     }
 

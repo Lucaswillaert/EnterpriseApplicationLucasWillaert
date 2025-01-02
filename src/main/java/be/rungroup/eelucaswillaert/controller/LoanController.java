@@ -11,6 +11,7 @@ import be.rungroup.eelucaswillaert.repository.LoanRepository;
 import be.rungroup.eelucaswillaert.repository.ProductRepository;
 import be.rungroup.eelucaswillaert.repository.UserRepository;
 import be.rungroup.eelucaswillaert.service.LoanService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +52,7 @@ public class LoanController {
 
 
     @GetMapping
-    public String basketView(HttpSession session, Model model) {
+    public String basketView(HttpSession session, Model model, HttpServletRequest request) {
 
         User user = (User) session.getAttribute("loggedUser");
         if (user == null) {
@@ -72,7 +73,7 @@ public class LoanController {
 
         LoanDTO loanDTO = loanService.getLoanByUserId(finalUser.getId());
         model.addAttribute("loan", loanDTO);
-
+        model.addAttribute("currentUri", request.getRequestURI());
         return "basket/basket-view"; // Thymeleaf-template
     }
 
