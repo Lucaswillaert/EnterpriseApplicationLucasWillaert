@@ -51,8 +51,20 @@ public class AuthController {
 
     @GetMapping("/register")
     public String registerPage(Model model, HttpServletRequest request) {
+        model.addAttribute("registrationDto", new RegistrationDto());
         model.addAttribute("currentUri", request.getRequestURI());
         return "/auth/register";
+    }
+
+    @PostMapping("/register/save")
+    public String registerUser(RegistrationDto registrationDto) {
+        User user = new User();
+        user.setEmail(registrationDto.getEmail());
+        user.setPassword(registrationDto.getPassword());
+        user.setFirstName(registrationDto.getFirstName());
+        user.setLastName(registrationDto.getLastName());
+        userRepository.save(user);
+        return "redirect:/login";
     }
 
     @GetMapping("/profile")
@@ -62,6 +74,8 @@ public class AuthController {
         model.addAttribute("currentUri", request.getRequestURI());
         return "/user/user-profile";
     }
+
+
 
 
 
