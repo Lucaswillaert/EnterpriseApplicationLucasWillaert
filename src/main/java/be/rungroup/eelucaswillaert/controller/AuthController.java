@@ -43,11 +43,23 @@ public class AuthController {
             return "/auth/login";
         }
     }
+    @GetMapping("/logout")
+    public String logout(HttpSession session){
+        session.invalidate(); // invalidate the session to logout the user
+        return "redirect:/login";
+    }
 
     @GetMapping("/register")
     public String registerPage(Model model, HttpServletRequest request) {
         model.addAttribute("currentUri", request.getRequestURI());
         return "/auth/register";
+    }
+
+    @GetMapping("/profile")
+    public String profilePage(Model model, HttpSession session) {
+        User user = (User) session.getAttribute("loggedUser");
+        model.addAttribute("user", user);
+        return "/user/user-profile";
     }
 
 

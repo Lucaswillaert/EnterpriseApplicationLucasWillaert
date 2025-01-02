@@ -7,6 +7,7 @@ import be.rungroup.eelucaswillaert.model.Tag;
 
 import be.rungroup.eelucaswillaert.service.ProductService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,7 @@ import java.util.List;
 
 @Controller
 @Service
+
 public class Productcontroller {
 
     @Autowired
@@ -33,11 +35,12 @@ public class Productcontroller {
     }
 
     @GetMapping("/products/product-list")
-    public String showAllProducts(Model model) {
+    public String showAllProducts(Model model, HttpServletRequest request) {
         List<ProductDto> products= productService.findAllProducts();
         model.addAttribute("products",products);
         model.addAttribute("tags", Tag.values());
         model.addAttribute("selectedTags", new ArrayList<>()); // Initialize selectedTags to prevent null pointer exception
+        model.addAttribute("currentUri", request.getRequestURI());
         return "/products/product-list";
     }
 
