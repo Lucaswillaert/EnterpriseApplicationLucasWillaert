@@ -37,6 +37,16 @@
             color: #333;
             text-decoration: none;
         }
+        .back-button {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            margin-top: 20px;
+            padding-bottom: 20px;
+        }
+        .back-button i {
+            margin-right: 5px;
+        }
     </style>
 </head>
 <body class="d-flex flex-column">
@@ -45,6 +55,11 @@
 <section layout:fragment="body">
     <!-- Page content-->
     <div class="container mt-5 mb-5">
+        <div class="back-button">
+            <button class="btn btn-secondary" onclick="history.back()">
+                <i class="fa fa-arrow-left"></i> Back
+            </button>
+        </div>
         <div class="card">
             <div class="card-body">
                 <div th:if="${product == null}">
