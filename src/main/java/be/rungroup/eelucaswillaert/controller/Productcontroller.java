@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -36,7 +37,7 @@ public class Productcontroller {
         List<ProductDto> products= productService.findAllProducts();
         model.addAttribute("products",products);
         model.addAttribute("tags", Tag.values());
-
+        model.addAttribute("selectedTags", new ArrayList<>()); // Initialize selectedTags to prevent null pointer exception
         return "/products/product-list";
     }
 
@@ -45,6 +46,7 @@ public class Productcontroller {
         Product product = new Product();
         model.addAttribute("product", product);
         model.addAttribute("tags", Tag.values());
+        model.addAttribute("selectedTags", new ArrayList<>());
         return "products/product-create";
     }
 
@@ -95,7 +97,6 @@ public class Productcontroller {
         return "products/product-edit";
     }
 
-
     @PostMapping("/products/{id}/edit")
     public String editProduct(@ModelAttribute ProductDto productDto, BindingResult result, Model model) throws IOException {
         if(result.hasErrors()){
@@ -118,6 +119,20 @@ public class Productcontroller {
     public String SearchCatalogue(@RequestParam(value="query")String query, Model model){
         List<ProductDto> products = productService.searchProducts(query);
         model.addAttribute("products",products);
+        return "/products/product-list";
+    }
+
+    @GetMapping("/products/filter")
+    public String filterProducts(@RequestParam(value="tags", required = false) List<String> tags, Model model){
+        List<ProductDto> products;
+        if(tags == null || tags.isEmpty()){
+            products = productService.findAllProducts();
+        } else {
+            products = productService.filterProductsByTags(tags);
+        }
+        model.addAttribute("products", products);
+        model.addAttribute("tags", Tag.values());
+        model.addAttribute("selectedTags", tags != null ? tags : new ArrayList<>());
         return "/products/product-list";
     }
 

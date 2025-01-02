@@ -21,4 +21,6 @@ public interface ProductService {
     boolean isProductAvailable(long id);
 
     byte[] getProductPhoto(Long id);
+
+    public List<ProductDto> filterProductsByTags(List<String> tags);
 }

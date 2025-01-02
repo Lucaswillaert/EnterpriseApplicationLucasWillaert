@@ -9,6 +9,23 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet"/>
 
   <title layout:title-pattern="$CONTENT_TITLE - $LAYOUT_TITLE">Lending Service RITCS</title>
+
+  <style>
+    .filter-sidebar {
+      position: fixed;
+      right: 0;
+      top: 0;
+      height: 100%;
+      width: 300px;
+      background-color: white;
+      box-shadow: -2px 0 5px rgba(0,0,0,0.5);
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+    }
+    .filter-sidebar.active {
+      transform: translateX(0);
+    }
+  </style>
 </head>
 <body>
 
@@ -53,9 +70,42 @@
         <div class="card-body">
           <form th:action="@{/products/search}" class="form-inline my-2 my-lg-0">
             <input name="query" class="form-control mr-sm-2" type="search" placeholder="Search materials" aria-label="Search">
+            <div class="mt-3">
+              <button type="button" class="btn btn-primary" id="filterButton">
+                Filter by Tags
+              </button>
+            </div>
           </form>
+          <div class="mt-3">
+
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+
+  <!-- Filter Sidebar -->
+  <!-- Filter Sidebar -->
+  <div class="filter-sidebar" id="filterSidebar">
+    <div class="p-4">
+      <h5>Filter by Tags</h5>
+      <form id="filterForm" th:action="@{/products/filter}" method="get">
+        <div class="form-group">
+          <label>Select Tags:</label>
+          <div th:each="tag : ${tags}">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" th:id="${tag}" th:name="tags" th:value="${tag}" th:checked="${selectedTags.contains(tag)}">
+              <label class="form-check-label" th:for="${tag}" th:text="${#strings.replace(tag, '_', ' ')}"></label>
+            </div>
+          </div>
+        </div>
+        <div class="d-flex justify-content-between mt-2">
+          <button type="submit" class="btn btn-sm btn-outline-primary">Apply Filter</button>
+          <button type="button" class="btn btn-sm btn-outline-secondary" id="deleteFiltersButton">Delete All Filters</button>
+        </div>
+      </form>
+      <button type="button" class="btn btn-sm btn-outline-secondary mt-2" id="closeFilterSidebar">Close</button>
     </div>
   </div>
 </div>
@@ -95,5 +145,19 @@
 <script src="/vendor/jquery/jquery.slim.min.js"></script>
 <script src="/vendor/popper/popper.min.js"></script>
 <script src="/vendor/bootstrap/js/bootstrap.min.js"></script>
+<script>
+  document.getElementById('filterButton').addEventListener('click',function(){
+    document.getElementById('filterSidebar').classList.add('active');
+  });
+  document.getElementById('closeFilterSidebar').addEventListener('click',function(){
+    document.getElementById('filterSidebar').classList.remove('active');
+  });
+
+  document.getElementById('deleteFiltersButton').addEventListener('click', function(){
+    const checkboxes = document.querySelectorAll('#filterForm input[type="checkbox"]');
+    checkboxes.forEach(checkbox =>{ checkbox.checked = false; });
+    document.getElementById('filterForm').submit(); // Submit the form to reset filters
+  })
+</script>
 </body>
 </html>

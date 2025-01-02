@@ -2,6 +2,7 @@ package be.rungroup.eelucaswillaert.service.impl;
 
 import be.rungroup.eelucaswillaert.dto.ProductDto;
 import be.rungroup.eelucaswillaert.model.Product;
+import be.rungroup.eelucaswillaert.model.Tag;
 import be.rungroup.eelucaswillaert.repository.ProductRepository;
 import be.rungroup.eelucaswillaert.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,6 +72,19 @@ public class ProductServiceImpl implements ProductService {
     public byte[] getProductPhoto(Long id) {
         Product product = productrepository.findById(id).orElseThrow(() -> new RuntimeException("Product not found"));
         return product.getPhoto();
+    }
+
+    @Override
+    public List<ProductDto> filterProductsByTags(List<String> tags) {
+        List<Tag> tagEnums = tags.stream()
+                .map(Tag::valueOf)
+                .collect(Collectors.toList());
+
+       List<Product> products = productrepository.findAll();
+       return products.stream()
+               .filter(product -> product.getTags().stream().anyMatch(tagEnums::contains))
+               .map(ProductServiceImpl::mapToProductDto)
+               .collect(Collectors.toList());
     }
 
     //mapt een model naar een Data Transfer Object
