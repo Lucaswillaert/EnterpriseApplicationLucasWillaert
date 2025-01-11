@@ -36,58 +36,48 @@ public class LoanServiceImpl implements LoanService {
         this.userRepository = userRepository;
     }
 
-    public void addProductToBasket(Long userId,
-                                   Long productId,
-                                   LocalDateTime startDate,
-                                   LocalDateTime endDate) {
+    @Override
+    public void addProductToBasket(Long userId, Long productId, LocalDateTime startDate, LocalDateTime endDate) {
+        // Zoek de gebruiker en het product
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+
+        // Haal de lening op, of maak een nieuwe aan als er geen lening bestaat
         Loan loan = loanRepository.findByUserId(user.getId())
                 .orElseGet(() -> {
                     Loan newLoan = new Loan(user, new ArrayList<>());
-                    return loanRepository.saveAndFlush(newLoan); // Force immediate database save
-
+                    return loanRepository.saveAndFlush(newLoan); // Forceer onmiddellijke database opslaan
                 });
 
-
-        if (loan.getLoan_id() == null) {
-            throw new IllegalStateException("Loan ID should not be null after saving.");
-        }
-        // Controleer of het product al in de basket zit
+        // Controleer of het product al in de winkelmand zit
         Optional<LoanItem> existingLoanItem = loan.getLoanItems().stream()
                 .filter(item -> item.getProduct().getProduct_id().equals(productId))
                 .findFirst();
 
-        System.out.println("Existing loan item: " + existingLoanItem);
         if (existingLoanItem.isPresent()) {
+            // Het product zit al in de winkelmand, verhoog de hoeveelheid
             LoanItem loanItem = existingLoanItem.get();
-            loanItem.setQuantity(loanItem.getQuantity() + 1);
-            loanItem.setReturned(false);  // Mark as not returned if added to the basket
+            loanItem.setQuantity(loanItem.getQuantity() + 1);  // Verhoog de hoeveelheid
+            loanItem.setReturned(false);  // Markeer als niet geretourneerd
         } else {
+            // Het product zit nog niet in de winkelmand, voeg het toe met een quantity van 1
             LoanItem loanItem = new LoanItem(product, 1, startDate, endDate, false);
-            loanItem.setLoan(loan); // Ensure the association is explicitly set
-            loan.getLoanItems().add(loanItem);
+            loanItem.setLoan(loan); // Zorg ervoor dat de relatie goed is ingesteld
+            loan.getLoanItems().add(loanItem); // Voeg het item toe aan de loan
         }
-        // Update voorraad en sla loan op
-        product.setTotalStock(product.getTotalStock() - 1);
-        loanRepository.save(loan);
-        productRepository.save(product);
+
+        // Update de voorraad van het product
+        product.setTotalStock(product.getTotalStock() - 1); // Verminder de voorraad
+        loanRepository.save(loan); // Sla de gewijzigde lening op
+        productRepository.save(product); // Sla het product op
     }
 
-    @Scheduled(cron = "0 0 0 * * ?") // Dagelijks om middernacht
-    public void checkExpiredLoans() {
-        List<Loan> expiredLoans = loanRepository.findAll().stream()
-                .filter(loan -> loan.getLoanItems().stream()
-                        .anyMatch(item -> item.getEndDate() != null && item.getEndDate().isBefore(LocalDateTime.now())))
-                .toList();
 
-        for (Loan loan : expiredLoans) {
-            System.out.println("Expired loan detected: " + loan.getLoan_id());
-        }
-    }
 
+
+    @Override
     public LoanDTO getLoanByUserId(Long userId) {
         Loan loan = loanRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Loan not found for user"));
@@ -116,17 +106,6 @@ public class LoanServiceImpl implements LoanService {
 
         loanRepository.save(loan);
         productRepository.save(product);
-    }
-
-    @Override
-    public int findQuantityPerProduct(Long loanId, Long productId) {
-        Loan loan = loanRepository.findById(loanId)
-                .orElseThrow(() -> new IllegalArgumentException("Loan not found"));
-
-        return loan.getLoanItems().stream()
-                .filter(item -> item.getProduct().getProduct_id().equals(productId))
-                .mapToInt(LoanItem::getQuantity)
-                .sum();
     }
 
     public void deleteLoan(Long id) {

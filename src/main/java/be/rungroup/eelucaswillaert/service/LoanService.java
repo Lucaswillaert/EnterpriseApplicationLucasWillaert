@@ -15,8 +15,6 @@ public interface LoanService {
 
      void returnProduct(Long loanId, Long productId);
 
-     int findQuantityPerProduct(Long loanId, Long productId);
-
      LoanDTO getLoanByUserId(Long userId);
 
      void deleteLoan(Long loanId);
