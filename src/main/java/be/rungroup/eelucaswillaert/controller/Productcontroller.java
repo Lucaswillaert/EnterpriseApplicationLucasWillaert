@@ -62,6 +62,9 @@ public class Productcontroller {
                 .body(photoBytes);
     }
 
+    //TODO foutmelding als product verkeerde datum heeft (ge geeft vb 22 jan start in  en 21 jan end in)
+    //TODO fix dat proudct als al eerder vb kabels in de mand zitten dat hij dan niet nog eens kabels erin steekt
+    //TODO fix dat als er al iets in steekt en steekt er nog iets anders in, dan dat dat niet verdubbeld wordt
     @GetMapping("/products/{id:[0-9]+}")
     public String productDetail(@PathVariable long id, Model model, HttpServletRequest request) {
         ProductDto productDto = productService.findById(id);

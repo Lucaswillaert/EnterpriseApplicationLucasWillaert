@@ -6,15 +6,103 @@
 <head>
   <meta charset="UTF-8">
   <title>Profile</title>
+  <link rel="stylesheet" href="/vendor/bootstrap/css/bootstrap.min.css">
 </head>
 <body>
 <main class="flex-shrink-0">
   <section layout:fragment="body" class="py-5">
     <div class="container">
       <h2>Profile Page</h2>
-      <p>Welcome to your profile page.</p>
+      <p>Welcome to your profile page, <span th:text="${user.firstName}"></span>!</p>
     </div>
+      <!-- student Loans Tabel -->
+    <div th:if="${!user.admin}">
+      <h3>Your Loans</h3>
+      <table class="table">
+        <thead>
+        <tr>
+          <th>Product Name</th>
+          <th>Start Date</th>
+          <th>End Date</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="loan : ${loans}">
+          <td th:each="item : ${loan.loanItems}" th:text="${item.product.name}"></td>
+          <td th:each="item : ${loan.loanItems}" th:text="${#temporals.format(item.startDate, 'dd-MM-yyyy')}"></td>
+          <td th:each="item : ${loan.loanItems}" th:text="${#temporals.format(item.endDate, 'dd-MM-yyyy')}"></td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+
+
+
+      <!-- Admin Board voor overview van alle loans dat er gebeurt zijn.  -->
+    <div th:if="${user.admin}">
+      <h3>Admin Board</h3>
+      <form method="post" action="/admin/return">
+        <table class="table">
+          <thead>
+          <tr>
+            <th>Email</th>
+            <th>Product Name</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Returned?</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="loan : ${allLoans}">
+            <td th:text="${loan.user.email}"></td>
+            <td th:each="item : ${loan.loanItems}">
+              <span th:text="${item.product.name}"></span>
+            </td>
+            <td th:each="item : ${loan.loanItems}">
+              <span th:text="${#temporals.format(item.startDate, 'dd-MM-yyyy')}"></span>
+            </td>
+            <td th:each="item : ${loan.loanItems}">
+              <span th:text="${#temporals.format(item.endDate, 'dd-MM-yyyy')}"></span>
+            </td>
+            <td th:each="item : ${loan.loanItems}"
+                th:classappend="${item.returned} ? 'table-success'">
+              <input type="checkbox"
+                     name="loanItemId"
+                     th:value="${item.id}"
+                     th:checked="${item.returned}"
+                     th:disabled="${item.returned}" />
+            </td>
+          </tr>
+          </tbody>
+        </table>
+        <button type="submit" class="btn btn-primary" id="confirmReturnsButton" disabled>Confirm Returns</button>
+      </form>
+    </div>
+
+
+
   </section>
 </main>
+<script src="/vendor/jquery/jquery.slim.min.js"></script>
+<script src="/vendor/popper/popper.min.js"></script>
+<script src="/vendor/bootstrap/js/bootstrap.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const confirmButton = document.getElementById('confirmReturnsButton');
+    const checkboxes = document.querySelectorAll('input[name="loanItemId"]');
+
+    function updateButtonState() {
+      const anyChecked = Array.from(checkboxes).some(checkbox => checkbox.checked && !checkbox.disabled);
+      confirmButton.disabled = !anyChecked;
+    }
+
+    checkboxes.forEach(checkbox => {
+      checkbox.addEventListener('change', updateButtonState);
+    });
+
+    updateButtonState(); // Initial check
+  });
+</script>
 </body>
 </html>

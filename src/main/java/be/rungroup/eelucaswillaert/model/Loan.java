@@ -32,7 +32,7 @@ public class Loan implements java.io.Serializable {
     private User user;
 
 
-    @OneToMany(mappedBy = "loan", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "loan", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @ToString.Exclude // Prevent stack overflow
     private List<LoanItem> loanItems = new ArrayList<>();
 
