@@ -16,7 +16,6 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productrepository;
 
-
     @Autowired
     public ProductServiceImpl(ProductRepository productrepository) {
         this.productrepository = productrepository;
@@ -39,14 +38,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductDto findById(Long id) {
         Product product = productrepository.findById(id).orElseThrow(()->new RuntimeException("Product not found"));
-        return mapToProductDto(product); //mapt een model naar een Data Transfer Object
-    }
-
-    @Override
-    public void updateProduct(ProductDto product) {
-        Product productToUpdate = mapToProduct(product);
-        productrepository.save(productToUpdate);
-
+        return mapToProductDto(product);
     }
 
     @Override
@@ -57,18 +49,11 @@ public class ProductServiceImpl implements ProductService {
         productrepository.deleteById(id);
 
     }
-
+    //zoek producten op basis van een query
     @Override
     public List<ProductDto> searchProducts(String query) {
         List<Product> products = productrepository.searchProducts(query);
         return products.stream().map(ProductServiceImpl::mapToProductDto).collect(Collectors.toList());
-    }
-
-    @Override
-    public boolean isProductAvailable(long id) {
-        Product product = productrepository.findById(id).get();
-
-        return product.getTotalStock() > 0;
     }
 
     @Override

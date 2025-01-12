@@ -71,6 +71,9 @@
                 <div th:if="${product.totalStock == 0}" class="out-of-stock-banner">
                     Materiaal is uit stock, hou deze pagina in de gaten of contacteer de administrator
                 </div>
+                <div th:if="${success}">
+                    <div class="alert alert-success" th:text="${success}"></div>
+                </div>
 
                 <div class="row">
                     <div class="col-lg-5 col-md-6 col-sm-12 align-bottom">

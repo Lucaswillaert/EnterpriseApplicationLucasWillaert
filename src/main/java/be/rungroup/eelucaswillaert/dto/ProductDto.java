@@ -20,7 +20,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductDto {
+public class ProductDto  implements java.io.Serializable {
 
     private Long product_id;
     @NotBlank(message = "Name is mandatory")

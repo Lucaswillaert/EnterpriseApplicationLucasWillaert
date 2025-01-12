@@ -18,24 +18,20 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-
     public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
 
     }
 
+    //opslaan van de user bij registratie
     @Override
     public void saveUser(RegistrationDto registrationDto) {
         User user = new User();
-        user.setEmail(String.valueOf(registrationDto.getEmail()));
-        user.setPassword(passwordEncoder.encode(registrationDto.getPassword()));
-        user.setAdmin(false); // this makes the user you create a admin, needs to be changed manually in the database
+        user.setEmail(registrationDto.getEmail());
+        user.setPassword(passwordEncoder.encode(registrationDto.getPassword())); // Hash het wachtwoord
+        user.setFirstName(registrationDto.getFirstName());
+        user.setLastName(registrationDto.getLastName());
+        user.setAdmin(false);
         userRepository.save(user);
-    }
-
-
-    @Override
-    public User findByEmail(String email) {
-        return userRepository.findByEmail(email);
     }
 }

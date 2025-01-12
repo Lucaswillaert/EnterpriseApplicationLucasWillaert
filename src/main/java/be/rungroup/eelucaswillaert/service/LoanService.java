@@ -17,17 +17,11 @@ public interface LoanService {
 
      LoanDTO getLoanByUserId(Long userId);
 
-     void deleteLoan(Long loanId);
-
      String checkoutLoan(Long userId);
 
      List<String> checkAvailability(LoanDTO loanDTO);
 
-     boolean isProductAvailable(Long productId, LocalDateTime startDate, LocalDateTime endDate);
-
      List<Loan> getLoansForUser(Long userId); // Alleen voor student
+
      List<Loan> getAllLoans(); // Alleen voor admin
-
-     List<User> getUsersWithActiveLoans();
-
 }

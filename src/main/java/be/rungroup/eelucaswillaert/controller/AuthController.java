@@ -14,14 +14,18 @@ import be.rungroup.eelucaswillaert.repository.ProductRepository;
 import be.rungroup.eelucaswillaert.repository.UserRepository;
 import be.rungroup.eelucaswillaert.service.LoanService;
 import be.rungroup.eelucaswillaert.service.UserService;
+import be.rungroup.eelucaswillaert.service.impl.UserServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -37,7 +41,8 @@ public class AuthController {
     private final LoanService loanService;
     private final LoanItemRepository loanItemRepository;
     private final PasswordEncoder passwordEncoder;
-    private UserService userService;
+    private final UserServiceImpl userServiceImpl;
+    private final UserService userService;
 
     @Autowired
     public AuthController(UserService userService,
@@ -45,7 +50,7 @@ public class AuthController {
                           LoanRepository loanRepository,
                           LoanService loanService,
                           LoanItemRepository loanItemRepository,
-                          ProductRepository productRepository, PasswordEncoder passwordEncoder) {
+                          ProductRepository productRepository, PasswordEncoder passwordEncoder, UserServiceImpl userServiceImpl) {
         this.userService = userService;
         this.userRepository = userRepository;
         this.loanRepository = loanRepository;
@@ -53,6 +58,7 @@ public class AuthController {
         this.loanItemRepository = loanItemRepository;
         this.productRepository = productRepository;
         this.passwordEncoder = passwordEncoder;
+        this.userServiceImpl = userServiceImpl;
     }
 
     @GetMapping("/login")
@@ -61,10 +67,15 @@ public class AuthController {
         return "/auth/login";
     }
 
+    //@Valid: Deze annotatie zorgt ervoor dat de validatie wordt uitgevoerd op het object dat als parameter wordt doorgegeven.
+    //BindingResult: Dit object bevat de resultaten van de validatie en eventuele fouten die zijn opgetreden. Hiermee kun je controleren of er validatiefouten zijn en deze afhandelen.
     @PostMapping("/login")
-    public String loginPagePost(Model model , HttpSession session, LoginDto loginDto){
+    public String loginPagePost(Model model , HttpSession session, @Valid @ModelAttribute LoginDto loginDto,BindingResult result){
+        if (result.hasErrors()) {
+            model.addAttribute("loginDto", loginDto);
+            return "/auth/login";
+        }
         User user = userRepository.findByEmail(loginDto.getEmail());
-
         if (user != null && passwordEncoder.matches(loginDto.getPassword(), user.getPassword())) {
             session.setAttribute("loggedUser", user);
             return "redirect:/products/product-list";
@@ -87,14 +98,12 @@ public class AuthController {
     }
 
     @PostMapping("/register/save")
-    public String registerUser(RegistrationDto registrationDto) {
-        User user = new User();
-        user.setEmail(registrationDto.getEmail());
-        user.setPassword(passwordEncoder.encode(registrationDto.getPassword())); // Hash het wachtwoord
-        user.setFirstName(registrationDto.getFirstName());
-        user.setLastName(registrationDto.getLastName());
-        user.setAdmin(false);
-        userRepository.save(user);
+    public String registerUser(@Valid @ModelAttribute RegistrationDto registrationDto, BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            model.addAttribute("registrationDto", registrationDto);
+            return "/auth/register";
+        }
+        userServiceImpl.saveUser(registrationDto);
         return "redirect:/login";
     }
 
@@ -117,8 +126,6 @@ public class AuthController {
         model.addAttribute("currentUri", request.getRequestURI());
         return "/user/user-profile";
     }
-
-
 
     @PostMapping("/admin/return")
     public String markItemsReturned(@RequestParam List<Long> returnedItems) {

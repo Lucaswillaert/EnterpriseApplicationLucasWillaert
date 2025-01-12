@@ -5,6 +5,4 @@ import be.rungroup.eelucaswillaert.model.User;
 
 public interface UserService {
     void saveUser(RegistrationDto registrationdto);
-
-    User findByEmail(String email);
 }

@@ -61,8 +61,7 @@ public class LoanController {
     }
 
 
-    //TODO fix de error dat als enddate voor startdate is dat er een error komt
-    //dit ligt wss bij de end.isBefore of meegeven van data, check de erorrs nog eens.
+
     @PostMapping("/add")
     public String addToBasket(
             @RequestParam("product_id") Long product_id,
@@ -96,16 +95,17 @@ public class LoanController {
             }
 
             // materiaal toevoegen aan de mand
-            redirectAttributes.addFlashAttribute("product", productRepository.findById(product_id));
             loanService.addProductToBasket(user.getId(), product_id, start, end);
-            return "redirect:/basket";
+            redirectAttributes.addFlashAttribute("productId", product.getProduct_id());
+            redirectAttributes.addFlashAttribute("success", "materiaal toegevoegd!");
+            return "redirect:/products/" + product_id;
 
         } catch(DateTimeParseException e){
             redirectAttributes.addFlashAttribute("error", "Invalid date format. Please select valid dates.");
             return "redirect:/products/" + product_id; // Fout bij datum parsing
         } catch (Exception e) {
             e.printStackTrace();
-            redirectAttributes.addFlashAttribute("error", "An error occurred:---------- " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "An error occurred:" + e.getMessage());
             return "redirect:/products/" + product_id;
         }
     }
@@ -168,8 +168,8 @@ public class LoanController {
             }
             // Als alles beschikbaar is, ga verder met de checkout
             String message = loanService.checkoutLoan(user.getId());
-            redirectAttributes.addFlashAttribute("success", "LeenTicket geconfirmeerd! Bekijk 'Jouw profiel' voor een overzicht.");
-            return "redirect:/checkout";
+            redirectAttributes.addFlashAttribute("success", "LeenTicket geconfirmeerd! Bekijk jouw profiel voor een overzicht.");
+            return "redirect:/basket/checkout";
 
         } catch (IllegalArgumentException | IllegalStateException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());

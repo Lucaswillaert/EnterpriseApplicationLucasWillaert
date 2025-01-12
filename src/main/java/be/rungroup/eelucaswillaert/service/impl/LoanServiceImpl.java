@@ -36,6 +36,7 @@ public class LoanServiceImpl implements LoanService {
         this.userRepository = userRepository;
     }
 
+
     @Override
     public void addProductToBasket(Long userId, Long productId, LocalDateTime startDate, LocalDateTime endDate) {
         // Zoek de gebruiker en het product
@@ -44,13 +45,12 @@ public class LoanServiceImpl implements LoanService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
-        // Haal de lening op, of maak een nieuwe aan als er geen lening bestaat
+        // Haal de lening op OF maak een nieuwe aan ALS er geen lening bestaat
         Loan loan = loanRepository.findByUserId(user.getId())
                 .orElseGet(() -> {
                     Loan newLoan = new Loan(user, new ArrayList<>());
                     return loanRepository.saveAndFlush(newLoan); // Forceer onmiddellijke database opslaan
                 });
-
         // Controleer of het product al in de winkelmand zit
         Optional<LoanItem> existingLoanItem = loan.getLoanItems().stream()
                 .filter(item -> item.getProduct().getProduct_id().equals(productId))
@@ -89,21 +89,20 @@ public class LoanServiceImpl implements LoanService {
     public void returnProduct(Long loanId, Long productId) {
         Loan loan = loanRepository.findById(loanId)
                 .orElseThrow(() -> new IllegalArgumentException("Loan not found"));
-
+        //opzoek naar het product in de loan
         LoanItem loanItem = loan.getLoanItems().stream()
                 .filter(item -> item.getProduct().getProduct_id().equals(productId))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Product not found in loan"));
-
+        // zet de quantity van het product terug min 1 en markeer het als geretourneerd
         loanItem.setQuantity(loanItem.getQuantity() - 1);
-        loanItem.setReturned(true);  // Mark the item as returned
+        loanItem.setReturned(true);
+        //als de quantity 0 is, verwijder het product uit de loan
         if (loanItem.getQuantity() <= 0) {
             loan.getLoanItems().remove(loanItem);
         }
-
         Product product = loanItem.getProduct();
-        product.setTotalStock(product.getTotalStock() + 1);
-
+        product.setTotalStock(product.getTotalStock() + 1); // Verhoog de voorraad
         loanRepository.save(loan);
         productRepository.save(product);
     }
@@ -111,15 +110,14 @@ public class LoanServiceImpl implements LoanService {
     public void deleteLoan(Long id) {
         Loan loan = loanRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Loan not found"));
-
         for (LoanItem item : loan.getLoanItems()) {
             Product product = item.getProduct();
             product.setTotalStock(product.getTotalStock() + item.getQuantity());
             productRepository.save(product);
         }
-
         loanRepository.deleteById(id);
     }
+
     //voert alleen de voorraadupdate en het leegmaken van de lening uit, zonder opnieuw te controleren of er voorraad is.
     @Override
     public String checkoutLoan(Long userId) {
@@ -129,18 +127,15 @@ public class LoanServiceImpl implements LoanService {
         if (loan.getLoanItems().isEmpty()) {
             throw new IllegalArgumentException("Your basket is empty. Cannot proceed with checkout.");
         }
-
         // Verminder voorraad en sla loan op
         for (LoanItem item : loan.getLoanItems()) {
             Product product = item.getProduct();
             product.setTotalStock(product.getTotalStock() - item.getQuantity());
             productRepository.save(product);
         }
-
         // Maak de loan leeg (of markeer het als verwerkt)
         //loan.getLoanItems().clear();
         loanRepository.save(loan);
-
         return "Loan processed successfully.";
     }
     //controleert nu eerst de voorraad en dan pas de beschikbaarheid van de datums.
@@ -167,16 +162,8 @@ public class LoanServiceImpl implements LoanService {
                         item.getEndDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
             }
         }
-        // Als er geen unavailable items zijn, return dan een lege lijst.
+        // Als er geen unavailable items zijn, returnt een lege lijst.
         return unavailableItems;
-    }
-    @Override
-    public boolean isProductAvailable(Long productId, LocalDateTime startDate, LocalDateTime endDate) {
-        List<LoanItem> conflictingItems = loanRepository.findAllByProductInAndDateRange(
-                List.of(productRepository.findById(productId)
-                        .orElseThrow(() -> new IllegalArgumentException("Product not found"))),
-                startDate, endDate);
-        return conflictingItems.isEmpty();
     }
 
     @Override
@@ -190,11 +177,7 @@ public class LoanServiceImpl implements LoanService {
         return loanRepository.findAllLoans();
     }
 
-    @Override
-    public List<User> getUsersWithActiveLoans() {
-        return loanRepository.findUsersWithActiveLoans();
-    }
-
+    //Mappers voor de DTO(DataTransferrable object) en model
     private LoanDTO mapToDTO(Loan loan) {
         List<LoanItemDto> loanItemDTOs = loan.getLoanItems().stream()
                 .map(item -> new LoanItemDto(
@@ -213,7 +196,6 @@ public class LoanServiceImpl implements LoanService {
                 loanItemDTOs
         );
     }
-
 
     private Loan mapToLoan(LoanDTO loanDTO) {
         Loan loan = new Loan();
