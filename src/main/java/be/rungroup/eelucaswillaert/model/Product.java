@@ -43,5 +43,13 @@ public class Product implements Serializable {
     @Enumerated(EnumType.STRING)
     private List<Tag> tags = new ArrayList<>();
 
+    public void addTag(Tag tag) {
+        tags.add(tag);
+    }
+
+    public void removeTag(Tag tag) {
+        this.tags.remove(tag);
+    }
+
 
 }
