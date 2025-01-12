@@ -18,6 +18,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,6 +36,7 @@ public class AuthController {
     private final LoanRepository loanRepository;
     private final LoanService loanService;
     private final LoanItemRepository loanItemRepository;
+    private final PasswordEncoder passwordEncoder;
     private UserService userService;
 
     @Autowired
@@ -43,13 +45,14 @@ public class AuthController {
                           LoanRepository loanRepository,
                           LoanService loanService,
                           LoanItemRepository loanItemRepository,
-                          ProductRepository productRepository) {
+                          ProductRepository productRepository, PasswordEncoder passwordEncoder) {
         this.userService = userService;
         this.userRepository = userRepository;
         this.loanRepository = loanRepository;
         this.loanService = loanService;
         this.loanItemRepository = loanItemRepository;
         this.productRepository = productRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping("/login")
@@ -62,7 +65,7 @@ public class AuthController {
     public String loginPagePost(Model model , HttpSession session, LoginDto loginDto){
         User user = userRepository.findByEmail(loginDto.getEmail());
 
-        if (user != null && user.getPassword().equals(loginDto.getPassword())) {
+        if (user != null && passwordEncoder.matches(loginDto.getPassword(), user.getPassword())) {
             session.setAttribute("loggedUser", user);
             return "redirect:/products/product-list";
         } else {
@@ -87,7 +90,7 @@ public class AuthController {
     public String registerUser(RegistrationDto registrationDto) {
         User user = new User();
         user.setEmail(registrationDto.getEmail());
-        user.setPassword(registrationDto.getPassword());
+        user.setPassword(passwordEncoder.encode(registrationDto.getPassword())); // Hash het wachtwoord
         user.setFirstName(registrationDto.getFirstName());
         user.setLastName(registrationDto.getLastName());
         user.setAdmin(false);
