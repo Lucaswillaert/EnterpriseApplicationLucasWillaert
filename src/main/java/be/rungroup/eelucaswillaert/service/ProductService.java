@@ -12,15 +12,11 @@ public interface ProductService {
 
     ProductDto findById(Long id);
 
-    void updateProduct(ProductDto club);
-
     void deleteProduct(long id);
 
     List<ProductDto> searchProducts(String query);
 
-    boolean isProductAvailable(long id);
-
     byte[] getProductPhoto(Long id);
 
-    public List<ProductDto> filterProductsByTags(List<String> tags);
+    List<ProductDto> filterProductsByTags(List<String> tags);
 }

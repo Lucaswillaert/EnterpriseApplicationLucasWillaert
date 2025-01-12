@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
-                xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link rel="stylesheet" href="/vendor/bootstrap/css/bootstrap.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 
-  <title layout:title-pattern="$CONTENT_TITLE - $LAYOUT_TITLE">Lending Service RITCS</title>
+  <title layout:title-pattern="\$CONTENT_TITLE - \$LAYOUT_TITLE">Lending Service RITCS</title>
 
   <style>
     .filter-sidebar {
@@ -25,11 +25,16 @@
     .filter-sidebar.active {
       transform: translateX(0);
     }
+    .dropdown-menu-right {
+      right: auto;
+      left: 50%;
+      transform: translateX(-50%);
+    }
   </style>
 </head>
 <body>
 
-<!-- Navigation-->
+<!-- Navigatie-->
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
@@ -38,24 +43,32 @@
     <img src="/assets/ritcs.png" width="100" height="70"  class="d-inline-block align-top" alt="">
   </a>
 
-  <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
+  <div th:if="${currentUri != '/login' and currentUri != '/register'}" class="collapse navbar-collapse" id="navbarTogglerDemo03">
     <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
       <li class="nav-item active">
         <a class="nav-link" th:href="@{/products/product-list}">Uitleendienst </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" th:href="@{/products/new}">Add a new Product</a>
+        <div th:if="${session.loggedUser != null and session.loggedUser.isAdmin}">
+          <a class="nav-link" th:href="@{/products/new}">Materiaal toevoegen</a>
+        </div>
       </li>
     </ul>
   </div>
-  <ul class="navbar-nav ml-auto mt-3 mt-lg-0">
+  <ul th:if="${currentUri != '/login' and currentUri != '/register'}" class="navbar-nav ml-auto mt-3 mt-lg-0">
     <li class="nav-item">
-      <a class="nav-link" th:href="@{/basket}">Winkelmand</a>
+      <a class="nav-link" th:href="@{/basket}">Basket</a>
     </li>
-    <li class="nav-item">
-      <a class="nav-link" href="#">Login</a>
+    <li class="nav-item dropdown">
+      <a class="nav-link dropdown-toggle" href="#" id="accountDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        Account
+      </a>
+      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown">
+        <li><a class="dropdown-item" th:href="@{/profile}">Profile</a></li>
+        <li><a class="dropdown-item" th:href="@{/logout}">Log Out</a></li>
+      </ul>
     </li>
-  </ul>
+    </ul>
 </nav>
 
 <!-- body content voegen we dan toe aan de section met de tag: layout:fragment="body"-->
@@ -64,30 +77,28 @@
     <div class="col-lg-9">
       <div layout:fragment="body"></div>
     </div>
-    <div class="col-lg-3">
+    <div th:if="${currentUri.startsWith('/products/product-list') or currentUri.startsWith('/products/filter') or currentUri.startsWith('/products/search')}" class="col-lg-3">
       <div class="card mb-4 mt-4">
         <div class="card-header">Zoek materiaal</div>
         <div class="card-body">
           <form th:action="@{/products/search}" class="form-inline my-2 my-lg-0">
             <input name="query" class="form-control mr-sm-2" type="search" placeholder="Search materials" aria-label="Search">
             <div class="mt-3">
-              <button type="button" class="btn btn-primary" id="filterButton">
+              <button type="button" class="btn btn-sm btn-outline-primary" id="filterButton">
                 Filter by Tags
               </button>
             </div>
           </form>
           <div class="mt-3">
 
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
-
 
   <!-- Filter Sidebar -->
-  <!-- Filter Sidebar -->
-  <div class="filter-sidebar" id="filterSidebar">
+  <div th:if="${currentUri.startsWith('/products/product-list') or currentUri.startsWith('/products/filter') or currentUri.startsWith('/products/search')}" class="filter-sidebar" id="filterSidebar">
     <div class="p-4">
       <h5>Filter by Tags</h5>
       <form id="filterForm" th:action="@{/products/filter}" method="get">
@@ -110,54 +121,62 @@
   </div>
 </div>
 
-
 <section class="py-5 bg-light">
   <div class="container px-5 my-5">
     <h2 class="display-4 fw-bolder mb-4">Leen hier je Materiaal!</h2>
-
-    <a class="btn btn-lg btn-primary" href="#!">Contact us</a>
+  </div>
+  <div class="container px-5 my-5">
+    <h3 class="fw-bolder mb-4">About</h3>
+    <p>Welkom bij de <strong> Uitleendienst </strong>, een speciaal ontwikkelde webapplicatie voor studenten van onze kunstopleiding. Dit platform biedt een eenvoudige en efficiënte manier om professioneel materiaal, zoals lampen, podiumelementen, lichtpanelen en kabels, te reserveren en te huren voor jouw creatieve projecten en eindwerken.</p>
+    <h4 class="fw-bolder mt-4">Belangrijke richtlijnen:</h4>
+    <ul>
+      <li><strong>Wees zorgzaam:</strong> Het materiaal dat je huurt, is essentieel voor jou én je medestudenten. Behandel het zorgvuldig en zorg ervoor dat het veilig opgeborgen wordt tijdens gebruik.</li>
+      <li><strong>Breng het op tijd terug:</strong> Houd rekening met de huurperiode en breng het materiaal altijd tijdig terug. Zo kunnen andere studenten er ook gebruik van maken en blijven projecten soepel verlopen.</li>
+    </ul>
+    <p>Door samen verantwoordelijkheid te nemen, zorgen we ervoor dat iedereen toegang heeft tot kwalitatief materiaal om zijn of haar artistieke visie tot leven te brengen. Laten we er samen voor zorgen dat dit platform optimaal blijft werken voor iedereen!</p>
   </div>
 </section>
-
-
 
 <!-- Footer-->
 <footer class="bg-dark py-4 mt-auto">
   <div class="container px-5">
     <div class="row align-items-center justify-content-between flex-column flex-sm-row">
-      <div class="col-auto"><div class="small m-0 text-white">Copyright &copy; Your Website 2023</div></div>
-      <div class="col-auto">
-        <a class="link-light small" href="#!">Privacy</a>
-        <span class="text-white mx-1">&middot;</span>
-        <a class="link-light small" href="#!">Terms</a>
-        <span class="text-white mx-1">&middot;</span>
-        <a class="link-light small" href="#!">Contact</a>
-      </div>
+      <div class="col-auto"><div class="small m-0 text-white">Copyright &copy; Uitleendienst 2025</div></div>
     </div>
   </div>
 </footer>
 
+<!-- Include Bootstrap JS and dependencies -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
-
-
-
-<!-- Bootstrap JS -->
-<script src="/vendor/jquery/jquery.slim.min.js"></script>
-<script src="/vendor/popper/popper.min.js"></script>
-<script src="/vendor/bootstrap/js/bootstrap.min.js"></script>
 <script>
-  document.getElementById('filterButton').addEventListener('click',function(){
+    document.addEventListener('DOMContentLoaded', function() {
+    const filterButton = document.getElementById('filterButton');
+    const closeFilterSidebar = document.getElementById('closeFilterSidebar');
+    const deleteFiltersButton = document.getElementById('deleteFiltersButton');
+
+    if (filterButton) {
+    filterButton.addEventListener('click', function() {
     document.getElementById('filterSidebar').classList.add('active');
   });
-  document.getElementById('closeFilterSidebar').addEventListener('click',function(){
+  }
+
+    if (closeFilterSidebar) {
+    closeFilterSidebar.addEventListener('click', function() {
     document.getElementById('filterSidebar').classList.remove('active');
   });
+  }
 
-  document.getElementById('deleteFiltersButton').addEventListener('click', function(){
+    if (deleteFiltersButton) {
+    deleteFiltersButton.addEventListener('click', function() {
     const checkboxes = document.querySelectorAll('#filterForm input[type="checkbox"]');
-    checkboxes.forEach(checkbox =>{ checkbox.checked = false; });
+    checkboxes.forEach(checkbox => {checkbox.checked = false;});
     document.getElementById('filterForm').submit(); // Submit the form to reset filters
-  })
+  });
+  }
+  });
 </script>
 </body>
 </html>

@@ -1,8 +1,5 @@
 package be.rungroup.eelucaswillaert.controller;
-
 import be.rungroup.eelucaswillaert.dto.LoanDTO;
-import be.rungroup.eelucaswillaert.dto.LoanItemDto;
-import be.rungroup.eelucaswillaert.dto.ProductDto;
 import be.rungroup.eelucaswillaert.model.Loan;
 import be.rungroup.eelucaswillaert.model.LoanItem;
 import be.rungroup.eelucaswillaert.model.Product;
@@ -11,26 +8,24 @@ import be.rungroup.eelucaswillaert.repository.LoanRepository;
 import be.rungroup.eelucaswillaert.repository.ProductRepository;
 import be.rungroup.eelucaswillaert.repository.UserRepository;
 import be.rungroup.eelucaswillaert.service.LoanService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static be.rungroup.eelucaswillaert.service.impl.ProductServiceImpl.mapToProductDto;
-
 @Controller
-@Service
 @RequestMapping("/basket")
 public class LoanController {
 
@@ -51,32 +46,21 @@ public class LoanController {
 
 
     @GetMapping
-    public String basketView(HttpSession session, Model model) {
+    public String basketView(HttpSession session, Model model, HttpServletRequest request) {
 
         User user = (User) session.getAttribute("loggedUser");
-        if (user == null) {
-            // Mock-gebruiker aanmaken
-            final User mockUser = new User();
-            mockUser.setId(1L); // Gebruik een fictief ID
-            mockUser.setVoornaam("John");
-            mockUser.setAchternaam("Doe");
-            mockUser.setEmail("john.Doe@gmail.com");
-            mockUser.setPassword("password");
-            mockUser.setAdmin(false);
-            user = mockUser;
-        // User user = (User) session.getAttribute("loggedUser");
-        //if (user == null) {
-            //return "redirect:/login"; // Redirect naar login indien geen gebruiker ingelogd
-        }
+
         final User finalUser = user;
         Loan loan = loanRepository.findByUserId(finalUser.getId())
                 .orElseGet(() -> loanRepository.save(new Loan(finalUser, new ArrayList<>())));
 
         LoanDTO loanDTO = loanService.getLoanByUserId(finalUser.getId());
         model.addAttribute("loan", loanDTO);
-
+        model.addAttribute("currentUri", request.getRequestURI());
         return "basket/basket-view"; // Thymeleaf-template
     }
+
+
 
     @PostMapping("/add")
     public String addToBasket(
@@ -84,73 +68,51 @@ public class LoanController {
             @RequestParam("startDate") String startDate,
             @RequestParam("endDate") String endDate,
             HttpSession session,
-            Model model
+            HttpServletRequest request,
+            Model model,
+            RedirectAttributes redirectAttributes
     ) {
-        /*User user = (User) session.getAttribute("loggedUser");
-        if (user == null) {
-            model.addAttribute("error", "Je moet ingelogd zijn om producten toe te voegen aan je winkelmandje.");
-            return "redirect:/login";
-        }*/
-         //Simuleer een ingelogde gebruiker als er geen gebruiker in de sessie zit
         User user = (User) session.getAttribute("loggedUser");
         if (user == null) {
-            // Mock-gebruiker aanmaken
-            user = new User();
-            user.setId(1L); // Gebruik een fictief ID
-            user.setVoornaam("John");
-            user.setAchternaam("Doe");
-            user.setEmail("john.Doe@gmail.com");
-            user.setPassword("password");
-            user.setAdmin(false);
-            session.setAttribute("loggedUser", user); // Voeg mock-gebruiker toe aan de sessie
-        } try {
-            logger.error("we zitten nu voor de local datum validatie ");
-            // Datum validatie
+            redirectAttributes.addFlashAttribute("error", "You must be logged in to add products to your basket.");
+            return "redirect:/login";
+        }
+        try {
+            // Date validation
             LocalDateTime start = LocalDate.parse(startDate).atStartOfDay();
             LocalDateTime end = LocalDate.parse(endDate).atStartOfDay();
             LocalDateTime now = LocalDateTime.now();
+            // Validatie: Controleer of de einddatum voor de startdatum ligt
             if (end.isBefore(start)) {
-                model.addAttribute("error", "De einddatum moet na de startdatum liggen.");
-                model.addAttribute("product", productRepository.findById(product_id)
-                        .orElseThrow(() -> new IllegalArgumentException("Product niet gevonden")));
-                return "products/product-detail";
-            } else if (start.isBefore(now) || end.isBefore(now)) {
-                model.addAttribute("error", "De startdatum en einddatum mogen niet in het verleden liggen.");
-                model.addAttribute("product", productRepository.findById(product_id)
-                        .orElseThrow(() -> new IllegalArgumentException("Product niet gevonden")));
-                return "products/product-detail";
+                logger.error("End date cannot be before start date.");
+                redirectAttributes.addFlashAttribute("error", "End date cannot be before start date.");
+                return "redirect:/products/" + product_id;
+            }
+            // Validatie: Controleer of de datums in het verleden liggen
+            if (start.isBefore(now) || end.isBefore(now)) {
+                redirectAttributes.addFlashAttribute("error", "Dates cannot be in the past.");
+                return "redirect:/products/" + product_id;
             }
 
-            logger.error("Product toevoegen aan winkelmandje: product_id={}, start={}, end={}", product_id, start, end);
+            // materiaal toevoegen aan de mand
             loanService.addProductToBasket(user.getId(), product_id, start, end);
+            redirectAttributes.addFlashAttribute("productId", product.getProduct_id());
+            redirectAttributes.addFlashAttribute("success", "materiaal toegevoegd!");
+            return "redirect:/products/" + product_id;
 
-            logger.error("Product toegevoegd aan winkelmandje: product_id={},productName={}, start={}, end={}", product_id,product.getName(), start, end);
-            return "redirect:/basket";
-
+        } catch(DateTimeParseException e){
+            redirectAttributes.addFlashAttribute("error", "Invalid date format. Please select valid dates.");
+            return "redirect:/products/" + product_id; // Fout bij datum parsing
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Er is een fout opgetreden: " + e.getMessage());
-            model.addAttribute("error", "Er is een fout opgetreden: " + e.getMessage());
-            logger.error("Er is een fout opgetreden bij het toevoegen aan de basket: {}", e.getMessage());
-            return "products/product-detail";
+            redirectAttributes.addFlashAttribute("error", "An error occurred:" + e.getMessage());
+            return "redirect:/products/" + product_id;
         }
     }
 
     @PostMapping("/remove")
-    public String removeFromBasket(@RequestParam("product_id") Long product_id, HttpSession session) {
+    public String removeFromBasket(@RequestParam("product_id") Long product_id, HttpSession session, HttpServletRequest request, Model model) {
         User user = (User) session.getAttribute("loggedUser");
-
-            if (user == null) {
-                // Mock user creation
-                user = new User();
-                user.setId(1L); // Use a fictitious ID
-                user.setVoornaam("John");
-                user.setAchternaam("Doe");
-                user.setEmail("john.Doe@gmail.com");
-                user.setPassword("password");
-                user.setAdmin(false);
-                session.setAttribute("loggedUser", user); // Add mock user to session
-            }
             try {
             Loan loan = loanRepository.findByUserId(user.getId())
                     .orElseThrow(() -> new IllegalArgumentException("Loan not found for user"));
@@ -165,10 +127,55 @@ public class LoanController {
 
         } catch (Exception e) {
             logger.error("Er is een fout opgetreden bij het verwijderen uit de basket: {}", e.getMessage());
+            model.addAttribute("currentUri", request.getRequestURI());
             return "redirect:/basket?error=" + e.getMessage();
         }
     }
 
+    @GetMapping("/checkout")
+    public String checkoutPage(Model model, HttpSession session, HttpServletRequest request) {
+        logger.info("GET /basket/checkout called"); // Voeg logging toe
+        User user = (User) session.getAttribute("loggedUser");
+        if (user == null) {
+            logger.warn("User is not logged in");
+            return "redirect:/login";
+        }
+
+        Loan loan = loanRepository.findByUserId(user.getId()).orElse(null);
+        model.addAttribute("loan", loan);
+        model.addAttribute("currentUri", request.getRequestURI());
+        return "basket/checkout";
+    }
+
+    @PostMapping("/checkout/confirm")
+    public String confirmCheckout(HttpSession session, RedirectAttributes redirectAttributes) {
+        logger.info("POST /basket/checkout/confirm called");
+        User user = (User) session.getAttribute("loggedUser");
+
+        if (user == null) {
+            redirectAttributes.addFlashAttribute("error", "Je moet ingelogd zijn om deze actie uit te voeren.");
+            return "redirect:/login";
+        }
+        try {
+            LoanDTO loanDTO = loanService.getLoanByUserId(user.getId());
+            List<String> availabilityMessages = loanService.checkAvailability(loanDTO);
+
+            if (!availabilityMessages.isEmpty()) {
+                // Voeg specifieke melding met product en periode toe
+                redirectAttributes.addFlashAttribute("availabilityMessages", availabilityMessages);
+                redirectAttributes.addFlashAttribute("error", "Sommige items zijn niet beschikbaar. Pas je basket aan.");
+                return "redirect:/basket/checkout";
+            }
+            // Als alles beschikbaar is, ga verder met de checkout
+            String message = loanService.checkoutLoan(user.getId());
+            redirectAttributes.addFlashAttribute("success", "LeenTicket geconfirmeerd! Bekijk jouw profiel voor een overzicht.");
+            return "redirect:/basket/checkout";
+
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/basket";
+        }
+    }
 
 
 

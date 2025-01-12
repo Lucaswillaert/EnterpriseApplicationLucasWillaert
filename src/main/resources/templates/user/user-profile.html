@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+  <meta charset="UTF-8">
+  <title>Profile</title>
+  <link rel="stylesheet" href="/vendor/bootstrap/css/bootstrap.min.css">
+</head>
+<body>
+<main class="flex-shrink-0">
+  <section layout:fragment="body" class="py-5">
+      <!-- student Loans Tabel -->
+    <div th:if="${!user.isAdmin()}">
+      <div class="container ps-5">
+        <h2>Profiel pagina van  <span th:text="${user.firstName}"></span>!</h2>
+        <br>
+        <h6>Regels over het uitlenen</h6>
+        <p>
+          Als student kun je materialen ophalen op de ingeplande dag tussen 13:00 en 16:00 uur.
+          Het terugbrengen van de materialen dient plaats te vinden op de aangegeven dag, uiterlijk om 09:00 uur.
+          Mocht er een probleem of vertraging zijn, zorg er dan voor dat je dit direct meldt.
+          Tijdige communicatie helpt ons om alles soepel te laten verlopen.
+        </p>
+        <p>Bedankt voor je medewerking!</p>
+      </div>
+
+      <div class="table-responsive ps-5">
+        <table class="table  table-striped table-hover">
+          <thead class="thead-dark">
+          <tr>
+            <th scope="col">Materiaal</th>
+            <th scope="col">Quantiteit</th>
+            <th scope="col">Start Datum</th>
+            <th scope="col">Eind Datum</th>
+          </tr>
+          </thead>
+          <tbody>
+          <!-- Itereer door de loans van de gebruiker en dan itereren over elk LoanItem binnen deze Loan -->
+          <th:block th:each="loan : ${loans}">
+            <th:block th:each="item : ${loan.loanItems}">
+              <tr>
+                <td th:text="${item.product.name}"></td>
+                <td th:text="${item.quantity}"></td>
+                <td th:text="${#temporals.format(item.startDate, 'dd-MM-yyyy')}"></td>
+                <td th:text="${#temporals.format(item.endDate, 'dd-MM-yyyy')}"></td>
+              </tr>
+            </th:block>
+          </th:block>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+
+
+
+      <!-- Admin Board voor overview van alle loans dat er gebeurt zijn.  -->
+      <div th:if="${user.isAdmin()}" class="ps-5" >
+        <h3>Admin Board</h3>
+        <form method="post" action="/admin/return">
+          <table class="table">
+            <thead>
+            <tr>
+              <th>Email</th>
+              <th>Product Name</th>
+              <th>Start Date</th>
+              <th>End Date</th>
+              <th>Returned?</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Itereer door de leningen -->
+            <th:block th:each="loan : ${allLoans}">
+              <!-- Itereer door elk LoanItem binnen de lening -->
+              <th:block th:each="item : ${loan.loanItems}">
+                <tr>
+                  <td th:text="${loan.user.email}"></td>  <!-- Email van de gebruiker -->
+                  <td th:text="${item.product.name}"></td>  <!-- Productnaam -->
+                  <td th:text="${#temporals.format(item.startDate, 'dd-MM-yyyy')}"></td>  <!-- Startdatum -->
+                  <td th:text="${#temporals.format(item.endDate, 'dd-MM-yyyy')}"></td>  <!-- Einddatum -->
+                  <td th:classappend="${item.returned} ? 'table-success'">
+                    <input type="checkbox"
+                           name="loanItemId[]"
+                           th:value="${item.id}"
+                           th:checked="${item.returned}"
+                           th:disabled="${item.returned}" />
+                  </td>
+                </tr>
+              </th:block>
+            </th:block>
+            </tbody>
+          </table>
+          <button type="submit" class="btn btn-sm btn-outline-primary" id="confirmReturnsButton" disabled>Confirm Returns</button>
+        </form>
+      </div>
+
+
+
+  </section>
+</main>
+<script src="/vendor/jquery/jquery.slim.min.js"></script>
+<script src="/vendor/popper/popper.min.js"></script>
+<script src="/vendor/bootstrap/js/bootstrap.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const confirmButton = document.getElementById('confirmReturnsButton');
+    const checkboxes = document.querySelectorAll('input[name="loanItemId[]"]');
+
+    function updateButtonState() {
+      const anyChecked = Array.from(checkboxes).some(checkbox => checkbox.checked && !checkbox.disabled);
+      confirmButton.disabled = !anyChecked;
+    }
+
+    checkboxes.forEach(checkbox => {
+      checkbox.addEventListener('change', updateButtonState);
+    });
+
+    updateButtonState(); // Initial check
+  });
+</script>
+</body>
+</html>

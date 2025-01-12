@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+  <meta charset="UTF-8">
+  <title>Register</title>
+  <style>
+    .form-container {
+      background-color: #f8f9fa;
+      padding: 20px;
+      border-radius: 5px;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    .form-container .form-control {
+      max-width: 300px;
+      margin: 0 auto;
+    }
+    .form-container .form-label {
+      display: block;
+      text-align: center;
+    }
+  </style>
+</head>
+<body class="d-flex flex-column h-100">
+<main class="flex-shrink-0">
+  <!-- Page Content-->
+  <section layout:fragment="body" class="py-5">
+    <div th:if="${param.fail}" class="alert alert-danger">
+      Invalid email! already exists!
+    </div>
+    <div class="container d-flex justify-content-center">
+      <div class="form-container">
+        <h2 class="text-center">Registratie Uitleendienst</h2>
+        <form role="form" method="post" th:action="@{/register/save}" th:object="${registrationDto}" class="row g-3">
+          <div class="col-12">
+            <label for="firstName" class="form-label">First Name</label>
+            <input
+                    type="text"
+                    class="form-control"
+                    id="firstName"
+                    name="firstName"
+                    th:field="*{firstName}">
+          </div>
+          <div class="col-12">
+            <label for="lastName" class="form-label">Last Name</label>
+            <input
+                    type="text"
+                    class="form-control"
+                    id="lastName"
+                    name="lastName"
+                    th:field="*{lastName}">
+          </div>
+          <div class="col-12">
+            <label for="email" class="form-label">Email</label>
+            <input
+                    type="email"
+                    class="form-control"
+                    id="email"
+                    name="email"
+                    th:field="*{email}">
+            <p th:if="${#fields.hasErrors('email')}" class="text-bg-danger" th:errors="*{email}"></p>
+          </div>
+          <div class="col-12">
+            <label for="password" class="form-label">Password</label>
+            <input
+                    type="password"
+                    class="form-control"
+                    id="password"
+                    name="password"
+                    th:field="*{password}">
+            <p th:if="${#fields.hasErrors('password')}" class="text-bg-danger" th:errors="*{password}"></p>
+          </div>
+          <div class="col-12 text-center">
+            <button th:href="@{/login}" class="btn btn-primary">Login Here</button>
+            <button type="submit" class="btn btn-primary">Register</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+</body>
+</html>

@@ -27,11 +27,15 @@ public class LoanItem {
     private LocalDateTime startDate;
     private LocalDateTime endDate;
 
-    public LoanItem(Product product, int quantity, LocalDateTime startDate, LocalDateTime endDate) {
+    private boolean returned;  // This will track whether the item has been returned
+
+
+    public LoanItem(Product product, int quantity, LocalDateTime startDate, LocalDateTime endDate, boolean returned) {
         this.product = product;
         this.quantity = quantity;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.returned = returned;
     }
 
 

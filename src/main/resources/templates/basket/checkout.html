@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check out</title>
+    <link rel="stylesheet" href="/vendor/bootstrap/css/bootstrap.min.css">
+</head>
+<body class="d-flex flex-column h-100">
+<main class="flex-shrink-0">
+    <section layout:fragment="body" class="py-5">
+        <!-- Error message -->
+        <div th:if="${error}">
+            <p class="alert alert-danger" th:text="${error}"></p>
+        </div>
+
+        <!-- Success message -->
+        <div th:if="${success}">
+            <p class="alert alert-success" th:text="${success}"></p>
+        </div>
+
+        <!-- Availability messages -->
+        <div th:if="${availabilityMessages}">
+            <p class="alert alert-warning" th:each="message : ${availabilityMessages}" th:text="${message}"></p>
+        </div>
+
+        <!-- Loan items -->
+        <form th:action="@{/basket/checkout/confirm}" method="post">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Startdatum</th>
+                    <th>Einddatum</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item : ${loan.loanItems}">
+                    <td th:text="${item.product.name}"></td>
+                    <td>
+                            <span class="text-dark">van
+                                <span th:text="${#temporals.format(item.startDate, 'dd-MM-yyyy')}"></span>
+                            </span>
+                    </td>
+                    <td>
+                            <span class="text-dark">tot
+                                <span th:text="${#temporals.format(item.endDate, 'dd-MM-yyyy')}"></span>
+                            </span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <!-- Confirm button -->
+            <button type="submit" class="btn btn-primary">Confirm</button>
+        </form>
+    </section>
+</main>
+<script src="/vendor/jquery/jquery.slim.min.js"></script>
+<script src="/vendor/popper/popper.min.js"></script>
+<script src="/vendor/bootstrap/js/bootstrap.min.js"></script>
+</body>
+</html>
