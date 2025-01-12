@@ -21,6 +21,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,37 +70,43 @@ public class LoanController {
             @RequestParam("endDate") String endDate,
             HttpSession session,
             HttpServletRequest request,
-            Model model
+            Model model,
+            RedirectAttributes redirectAttributes
     ) {
         User user = (User) session.getAttribute("loggedUser");
         if (user == null) {
-            model.addAttribute("error", "You must be logged in to add products to your basket.");
+            redirectAttributes.addFlashAttribute("error", "You must be logged in to add products to your basket.");
             return "redirect:/login";
         }
         try {
             // Date validation
             LocalDateTime start = LocalDate.parse(startDate).atStartOfDay();
-            logger.error("Start date: {}", start);
             LocalDateTime end = LocalDate.parse(endDate).atStartOfDay();
-            logger.error("End date: {}", end);
             LocalDateTime now = LocalDateTime.now();
+            // Validatie: Controleer of de einddatum voor de startdatum ligt
             if (end.isBefore(start)) {
                 logger.error("End date cannot be before start date.");
-                model.addAttribute("error", "End date cannot be before start date.");
-                return "/products/product-detail";
-            } else if (start.isBefore(now) || end.isBefore(now)) {
-                model.addAttribute("error", "Dates cannot be in the past.");
-                return "/products/product-detail";
+                redirectAttributes.addFlashAttribute("error", "End date cannot be before start date.");
+                return "redirect:/products/" + product_id;
+            }
+            // Validatie: Controleer of de datums in het verleden liggen
+            if (start.isBefore(now) || end.isBefore(now)) {
+                redirectAttributes.addFlashAttribute("error", "Dates cannot be in the past.");
+                return "redirect:/products/" + product_id;
             }
 
-            // Add product to basket
+            // materiaal toevoegen aan de mand
+            redirectAttributes.addFlashAttribute("product", productRepository.findById(product_id));
             loanService.addProductToBasket(user.getId(), product_id, start, end);
             return "redirect:/basket";
 
+        } catch(DateTimeParseException e){
+            redirectAttributes.addFlashAttribute("error", "Invalid date format. Please select valid dates.");
+            return "redirect:/products/" + product_id; // Fout bij datum parsing
         } catch (Exception e) {
             e.printStackTrace();
-            model.addAttribute("error", "An error occurred:---------- " + e.getMessage());
-            return "/products/product-detail";
+            redirectAttributes.addFlashAttribute("error", "An error occurred:---------- " + e.getMessage());
+            return "redirect:/products/" + product_id;
         }
     }
 
@@ -162,7 +169,7 @@ public class LoanController {
             // Als alles beschikbaar is, ga verder met de checkout
             String message = loanService.checkoutLoan(user.getId());
             redirectAttributes.addFlashAttribute("success", "LeenTicket geconfirmeerd! Bekijk 'Jouw profiel' voor een overzicht.");
-            return "redirect:/profile";
+            return "redirect:/checkout";
 
         } catch (IllegalArgumentException | IllegalStateException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());

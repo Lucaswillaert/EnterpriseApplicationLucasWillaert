@@ -51,6 +51,10 @@
 <main class="flex-shrink-0">
   <section layout:fragment="body" class="py-5">
     <div class="container">
+
+      <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+      <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
       <div class="row">
         <div th:each="product : ${products}" class="col-md-4 mb-4 d-flex align-items-stretch">
           <div class="card text-center w-100">

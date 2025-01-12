@@ -133,7 +133,6 @@ public class LoanServiceImpl implements LoanService {
         // Verminder voorraad en sla loan op
         for (LoanItem item : loan.getLoanItems()) {
             Product product = item.getProduct();
-            // Nu hoef je niet meer te controleren of de voorraad voldoende is, dit is al gedaan in checkAvailability
             product.setTotalStock(product.getTotalStock() - item.getQuantity());
             productRepository.save(product);
         }

@@ -50,7 +50,7 @@
       </li>
       <li class="nav-item">
         <div th:if="${session.loggedUser != null and session.loggedUser.isAdmin}">
-          <a class="nav-link" th:href="@{/products/new}">Create a New Product</a>
+          <a class="nav-link" th:href="@{/products/new}">Materiaal toevoegen</a>
         </div>
       </li>
     </ul>
@@ -84,7 +84,7 @@
           <form th:action="@{/products/search}" class="form-inline my-2 my-lg-0">
             <input name="query" class="form-control mr-sm-2" type="search" placeholder="Search materials" aria-label="Search">
             <div class="mt-3">
-              <button type="button" class="btn btn-primary" id="filterButton">
+              <button type="button" class="btn btn-sm btn-outline-primary" id="filterButton">
                 Filter by Tags
               </button>
             </div>

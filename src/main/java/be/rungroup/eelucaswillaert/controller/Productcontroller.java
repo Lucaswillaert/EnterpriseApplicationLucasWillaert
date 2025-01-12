@@ -5,9 +5,12 @@ import be.rungroup.eelucaswillaert.exceptions.FileSizeLimitExceededException;
 import be.rungroup.eelucaswillaert.model.Product;
 import be.rungroup.eelucaswillaert.model.Tag;
 
+import be.rungroup.eelucaswillaert.model.User;
 import be.rungroup.eelucaswillaert.service.ProductService;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +20,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,7 +39,11 @@ public class Productcontroller {
     }
 
     @GetMapping("/products/product-list")
-    public String showAllProducts(Model model, HttpServletRequest request) {
+    public String showAllProducts(Model model, HttpServletRequest request, HttpServletResponse response) {
+        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        response.setHeader("Pragma", "no-cache");
+        response.setHeader("Expires", "0");
+
         List<ProductDto> products= productService.findAllProducts();
         model.addAttribute("products",products);
         model.addAttribute("tags", Tag.values());
@@ -62,11 +70,12 @@ public class Productcontroller {
                 .body(photoBytes);
     }
 
-    //TODO foutmelding als product verkeerde datum heeft (ge geeft vb 22 jan start in  en 21 jan end in)
-    //TODO fix dat proudct als al eerder vb kabels in de mand zitten dat hij dan niet nog eens kabels erin steekt
-    //TODO fix dat als er al iets in steekt en steekt er nog iets anders in, dan dat dat niet verdubbeld wordt
+
     @GetMapping("/products/{id:[0-9]+}")
-    public String productDetail(@PathVariable long id, Model model, HttpServletRequest request) {
+    public String productDetail(@PathVariable long id, Model model, HttpServletRequest request, HttpSession session) {
+        User user = (User) session.getAttribute("loggedUser");
+        model.addAttribute("user", user);
+
         ProductDto productDto = productService.findById(id);
         if (productDto == null) {
             throw new RuntimeException("Product not found with id: " + id);
@@ -97,30 +106,16 @@ public class Productcontroller {
         return "redirect:/products/product-list";
     }
 
-    @GetMapping("/products/{id}/edit")
-    public String editProductForm(@PathVariable long id, Model model ){
-        ProductDto productDto = productService.findById(id);
-        model.addAttribute("product",productDto);
-        model.addAttribute("tags", Tag.values());
-        return "products/product-edit";
-    }
 
-    @PostMapping("/products/{id}/edit")
-    public String editProduct(@ModelAttribute ProductDto productDto, BindingResult result, Model model) throws IOException {
-        if(result.hasErrors()){
-            model.addAttribute("product",productDto);
-            return "products/product-edit";
+    @PostMapping("/products/{id}/delete")
+    public String deleteProduct(@PathVariable long id, RedirectAttributes redirectAttributes) {
+        try {
+            productService.deleteProduct(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Product successfully deleted.");
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
-        else {
-            productService.updateProduct(productDto);
-            return "redirect:/products";
-        }
-    }
-
-    @DeleteMapping("/products/{id}/delete")
-    public String deleteProduct(@PathVariable long id){
-        productService.deleteProduct(id);
-        return "redirect:/products";
+        return "redirect:/products/product-list";
     }
 
     @GetMapping("/products/search")

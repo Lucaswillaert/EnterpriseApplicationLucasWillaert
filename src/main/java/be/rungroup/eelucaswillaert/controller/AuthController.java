@@ -102,8 +102,6 @@ public class AuthController {
             return "redirect:/login";
         }
 
-        model.addAttribute("user", user);
-
         if (user.isAdmin()) {
             List<Loan> allLoans = loanService.getAllLoans();
             model.addAttribute("allLoans", allLoans);
@@ -112,7 +110,7 @@ public class AuthController {
             System.out.println("Loans for user: " + userLoan);  // Debugging
             model.addAttribute("loans", userLoan);
         }
-
+        model.addAttribute("user", user);
         model.addAttribute("currentUri", request.getRequestURI());
         return "/user/user-profile";
     }

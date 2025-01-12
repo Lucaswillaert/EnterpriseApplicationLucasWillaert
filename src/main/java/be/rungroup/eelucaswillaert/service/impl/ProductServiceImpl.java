@@ -51,6 +51,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void deleteProduct(long id) {
+        if (!productrepository.existsById(id)) {
+            throw new RuntimeException("Product not found with id: " + id);
+        }
         productrepository.deleteById(id);
 
     }
