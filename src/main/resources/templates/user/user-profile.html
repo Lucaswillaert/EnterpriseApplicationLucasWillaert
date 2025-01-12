@@ -83,7 +83,7 @@
                   <td th:text="${#temporals.format(item.endDate, 'dd-MM-yyyy')}"></td>  <!-- Einddatum -->
                   <td th:classappend="${item.returned} ? 'table-success'">
                     <input type="checkbox"
-                           name="loanItemId"
+                           name="loanItemId[]"
                            th:value="${item.id}"
                            th:checked="${item.returned}"
                            th:disabled="${item.returned}" />
@@ -107,7 +107,7 @@
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     const confirmButton = document.getElementById('confirmReturnsButton');
-    const checkboxes = document.querySelectorAll('input[name="loanItemId"]');
+    const checkboxes = document.querySelectorAll('input[name="loanItemId[]"]');
 
     function updateButtonState() {
       const anyChecked = Array.from(checkboxes).some(checkbox => checkbox.checked && !checkbox.disabled);
