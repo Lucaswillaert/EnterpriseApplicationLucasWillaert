@@ -85,8 +85,8 @@ public class DataLoader implements CommandLineRunner {
 
     private void createAdminUser() {
         User admin = new User();
-        admin.setEmail("admin@example.com");
-        admin.setPassword(passwordEncoder.encode("adminpassword"));
+        admin.setEmail("admin@mail.com");
+        admin.setPassword(passwordEncoder.encode("adminpassword123"));
         admin.setAdmin(true);
         UserRepository.save(admin);
     }
